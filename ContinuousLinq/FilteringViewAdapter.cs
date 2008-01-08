@@ -23,13 +23,10 @@ namespace ContinuousLinq
             Trace.WriteLine("[FVA] Init.");
             _predicate = predicateFunc;
 
-            if (input.InnerAsList != null)
+            foreach (T item in input.InnerAsList)
             {
-                foreach (T item in input.InnerAsList)
-                {
-                    if (_predicate(item))
-                        output.Add(item);
-                }
+                if (_predicate(item))
+                    output.Add(item);
             }
         }
 

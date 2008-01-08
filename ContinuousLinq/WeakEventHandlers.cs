@@ -17,11 +17,8 @@ namespace ContinuousLinq
 
         public WeakCollectionChangedHandler(INotifyCollectionChanged owner, NotifyCollectionChangedEventHandler target) : base(target)
         {
-            if (owner != null)
-            {
-                _owner = owner;
-                _owner.CollectionChanged += OnCollectionChanged;
-            }
+            _owner = owner;
+            _owner.CollectionChanged += OnCollectionChanged;
         }
 
         public void Detach()

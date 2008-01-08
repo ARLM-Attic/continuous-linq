@@ -46,12 +46,9 @@ namespace ContinuousLinq
                                            };
             new WeakCollectionChangedHandler(_input.InnerAsNotifier, _collectionChangedDelegate);
 
-            if (input.InnerAsList != null)
+            foreach (Tin item in input.InnerAsList)
             {
-                foreach (Tin item in input.InnerAsList)
-                {
-                    SubscribeToItemNoCheck(item);
-                }
+                SubscribeToItemNoCheck(item);
             }
         }
 
