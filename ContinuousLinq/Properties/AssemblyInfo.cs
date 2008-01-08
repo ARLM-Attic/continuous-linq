@@ -6,11 +6,11 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("ContinuousLinq")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("Continuous Query Extensions for LINQ")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Liquidnet")]
+[assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("ContinuousLinq")]
-[assembly: AssemblyCopyright("Copyright © Liquidnet 2007")]
+[assembly: AssemblyCopyright("Copyright (c) 2007 Kevin Hoffman")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
