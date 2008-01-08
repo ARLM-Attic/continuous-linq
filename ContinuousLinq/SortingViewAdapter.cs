@@ -7,6 +7,14 @@ using ISimpleComparer = System.Collections.IComparer;
 
 namespace ContinuousLinq
 {
+    /// <summary>
+    /// This adapter applies a sort clause to an input collection. The output collection represents
+    /// the sorted contents of the input collection, sorted according to the sort clause indicated
+    /// by the compare function. As changes to the input collection are detected (which could be caused
+    /// by other adapters using that as an output collection in the chain), the output collection
+    /// is re-sorted accordingly.
+    /// </summary>
+    /// <typeparam name="TSource"></typeparam>
     internal sealed class SortingViewAdapter<TSource> :
         ViewAdapter<TSource, TSource> where TSource : IEquatable<TSource>, INotifyPropertyChanged
     {

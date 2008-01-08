@@ -5,7 +5,9 @@ namespace ContinuousLinq
 {
     /// <summary>
     /// Many thanks to Oren @ the SLINQ project, this class is extremely useful
-    /// and a huge time-saver
+    /// and a huge time-saver. This class allows us to encapsulate a sort clause
+    /// from a LINQ query in a single instance that can be passed as a parameter
+    /// or, in the case of the SortingViewAdapter, stored as an instance member variable.
     /// </summary>
     /// <typeparam name="TSource"></typeparam>
     /// <typeparam name="TKey"></typeparam>

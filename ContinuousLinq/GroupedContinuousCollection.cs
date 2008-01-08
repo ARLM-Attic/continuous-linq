@@ -4,6 +4,14 @@ using System.Linq;
 
 namespace ContinuousLinq
 {    
+    /// <summary>
+    /// This class was created to be the outbound results of a continuous query that used a group-by
+    /// clause. The grouping results are stored as a "continous collection of continuous collections", where
+    /// each continuous collection in the outbound collection is actually a GroupedContinuousCollection, which adds
+    /// the IGrouping interface support.
+    /// </summary>
+    /// <typeparam name="TKey"></typeparam>
+    /// <typeparam name="TElement"></typeparam>
     public class GroupedContinuousCollection<TKey, TElement> :
         ContinuousCollection<TElement>, IGrouping<TKey, TElement>,
         IEquatable<GroupedContinuousCollection<TKey, TElement>>

@@ -5,6 +5,15 @@ using System.Windows.Threading;
 
 namespace ContinuousLinq
 {
+    /// <summary>
+    /// The GroupingViewAdapter is a view adapter that takes an input collection and applies
+    /// a grouping algorithm to it (defined by the group-by clause in the original LINQ query).
+    /// The results of the grouping clause are created in an output collection which we
+    /// require to be a ContinuousCollection of GroupedContinuousCollection instances.
+    /// </summary>
+    /// <typeparam name="TSource"></typeparam>
+    /// <typeparam name="TKey"></typeparam>
+    /// <typeparam name="TElement"></typeparam>
     internal sealed class GroupingViewAdapter<TSource, TKey, TElement> :
         ViewAdapter<TSource, GroupedContinuousCollection<TKey, TElement>>
             where TSource : IEquatable<TSource>, INotifyPropertyChanged

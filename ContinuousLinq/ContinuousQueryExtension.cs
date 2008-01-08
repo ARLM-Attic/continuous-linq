@@ -8,10 +8,10 @@ namespace ContinuousLinq
 {
     /// <summary>
     /// This class and the adapter model was inspired by the SLINQ (http://www.codeplex.com/slinq) project
-    /// The main difference between this project and SLINQ is this project endeavors to use standard
-    /// facilities available within the framework today whereas SLINQ builds on a 3rd party collection
-    /// toolset and requires a polling timer to observe changes because his changes are not propagated
-    /// to the WPF GUI dispatcher.
+    /// The philosophical difference between this project and SLINQ and others like it is that the goal of 
+    /// ContinuousLINQ is to support data binding to a continually changing result set based on a query that
+    /// is continuously re-evaluated as changes occur in the original collection. Other libraries for continuous
+    /// queries require the UI to poll the changing collection on a timer, which isn't as continuous as I like.
     /// </summary>
     public static class ContinuousQueryExtension
     {

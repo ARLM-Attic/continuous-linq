@@ -5,6 +5,12 @@ using System.ComponentModel;
 
 namespace ContinuousLinq
 {
+    /// <summary>
+    /// An adapter that allows LINQ queries to contain semi-complex 'select' clauses
+    /// and still remain continuous.
+    /// </summary>
+    /// <typeparam name="TSource"></typeparam>
+    /// <typeparam name="TResult"></typeparam>
     internal sealed class SelectingManyViewAdapter<TSource, TResult> :
         ViewAdapter<TSource, TResult> where TSource : IEquatable<TSource>, INotifyPropertyChanged
     {
@@ -62,7 +68,6 @@ namespace ContinuousLinq
 
         protected override void OnCollectionItemPropertyChanged(TSource item, string propertyName)
         {
-            // Damn, no index.
             int index = _input.InnerAsList.IndexOf(item);
             ReplacedOrChanged(item, index);
         }

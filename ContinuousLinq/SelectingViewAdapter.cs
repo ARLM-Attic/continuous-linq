@@ -4,6 +4,12 @@ using System.ComponentModel;
 
 namespace ContinuousLinq
 {
+    /// <summary>
+    /// Allows continuous queries to be created using a custom select clause
+    /// while still maintaining the continous output result set.
+    /// </summary>
+    /// <typeparam name="TSource"></typeparam>
+    /// <typeparam name="TResult"></typeparam>
     internal sealed class SelectingViewAdapter<TSource, TResult> :
         ViewAdapter<TSource, TResult> where TSource : IEquatable<TSource>, INotifyPropertyChanged
     {
