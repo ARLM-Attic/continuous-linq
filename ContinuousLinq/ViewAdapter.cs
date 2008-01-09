@@ -14,7 +14,7 @@ namespace ContinuousLinq
     /// This hard link is the collection's SourceAdapter, which is also
     /// used for other purposes.
     internal abstract class ViewAdapter<Tin, Tout>
-        where Tin : IEquatable<Tin>, INotifyPropertyChanged
+        where Tin : INotifyPropertyChanged
     {
         protected InputCollectionWrapper<Tin> _input;
         protected ContinuousCollection<Tout> _output;

@@ -6,7 +6,7 @@ using System.ComponentModel;
 
 namespace NetworkLibrary.Implementations
 {
-    public class Transaction : IEquatable<Transaction>, INotifyPropertyChanged
+    public class Transaction : INotifyPropertyChanged
     {
         private string _employeeSource;
         private int _quantity;
@@ -78,28 +78,12 @@ namespace NetworkLibrary.Implementations
                 NotifyChanged("SKU");
             }
         }
-
-        #region IEquatable<Transaction> Members
-
-        public bool Equals(Transaction other)
-        {
-            if ((other.WarehouseName == this.WarehouseName) &&
-                 (other.SKU == this.SKU) &&
-                 (other.Amount == this.Amount) &&
-                 (other.Quantity == this.Quantity) &&
-                 (other.EmployeeSource == this.EmployeeSource))
-                return true;
-            else
-                return false;
-        }
-
+       
         private void NotifyChanged(string propName)
         {
             if (PropertyChanged != null)
                 PropertyChanged(this, new PropertyChangedEventArgs(propName));
         }
-
-        #endregion
 
         #region INotifyPropertyChanged Members
 

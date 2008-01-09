@@ -12,7 +12,7 @@ namespace ContinuousLinq
     /// only those items that pass the filter predicate (included in the LINQ query in the where clause)
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    internal sealed class FilteringViewAdapter<T> : ViewAdapter<T, T> where T : IEquatable<T>, INotifyPropertyChanged
+    internal sealed class FilteringViewAdapter<T> : ViewAdapter<T, T> where T : INotifyPropertyChanged
     {
         private readonly Func<T, bool> _predicate;
 

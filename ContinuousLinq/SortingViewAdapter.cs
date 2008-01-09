@@ -16,7 +16,7 @@ namespace ContinuousLinq
     /// </summary>
     /// <typeparam name="TSource"></typeparam>
     internal sealed class SortingViewAdapter<TSource> :
-        ViewAdapter<TSource, TSource> where TSource : IEquatable<TSource>, INotifyPropertyChanged
+        ViewAdapter<TSource, TSource> where TSource : INotifyPropertyChanged
     {
         private IComparer<TSource> _compareFunc;
         private bool _isLastInChain = true;

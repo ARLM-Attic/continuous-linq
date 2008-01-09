@@ -12,7 +12,7 @@ namespace ContinuousLinq
     /// <typeparam name="TSource"></typeparam>
     /// <typeparam name="TResult"></typeparam>
     internal sealed class SelectingManyViewAdapter<TSource, TResult> :
-        ViewAdapter<TSource, TResult> where TSource : IEquatable<TSource>, INotifyPropertyChanged
+        ViewAdapter<TSource, TResult> where TSource : INotifyPropertyChanged
     {
         private readonly Func<TSource, IEnumerable<TResult>> _func;
         private readonly List<int> _collectionLengths = new List<int>();

@@ -17,7 +17,7 @@ namespace ContinuousLinq
     {
         #region Where
         private static ContinuousCollection<T> Where<T>(
-            InputCollectionWrapper<T> source, Func<T, bool> filterFunc) where T : IEquatable<T>, INotifyPropertyChanged
+            InputCollectionWrapper<T> source, Func<T, bool> filterFunc) where T : INotifyPropertyChanged
         {
             Trace.WriteLine("Filtering Observable Collection.");
             ContinuousCollection<T> output = new ContinuousCollection<T>();
@@ -27,12 +27,12 @@ namespace ContinuousLinq
         }
 
         public static ContinuousCollection<T> Where<T>(
-            this ObservableCollection<T> source, Func<T, bool> filterFunc) where T : IEquatable<T>, INotifyPropertyChanged
+            this ObservableCollection<T> source, Func<T, bool> filterFunc) where T : INotifyPropertyChanged
         {
             return Where(new InputCollectionWrapper<T>(source), filterFunc);            
         }
         public static ContinuousCollection<T> Where<T>(
-            this ReadOnlyObservableCollection<T> source, Func<T, bool> filterFunc) where T : IEquatable<T>, INotifyPropertyChanged
+            this ReadOnlyObservableCollection<T> source, Func<T, bool> filterFunc) where T :  INotifyPropertyChanged
         {
             return Where(new InputCollectionWrapper<T>(source), filterFunc);
         }
@@ -41,7 +41,7 @@ namespace ContinuousLinq
         #region OrderBy
         private static ContinuousCollection<TSource> OrderBy<TSource, TKey>(
             InputCollectionWrapper<TSource> source, Func<TSource, TKey> keySelector)
-            where TSource : IEquatable<TSource>, INotifyPropertyChanged
+            where TSource : INotifyPropertyChanged
             where TKey : IComparable
         {
             Trace.WriteLine("Ordering Observable Collection (Ascending).");
@@ -55,28 +55,28 @@ namespace ContinuousLinq
 
         public static ContinuousCollection<TSource> OrderBy<TSource, TKey>(
             this ObservableCollection<TSource> source, Func<TSource, TKey> keySelector)
-            where TSource : IEquatable<TSource>, INotifyPropertyChanged
+            where TSource : INotifyPropertyChanged
             where TKey : IComparable
         {
             return OrderBy(new InputCollectionWrapper<TSource>(source), keySelector);
         }
         public static ContinuousCollection<TSource> OrderBy<TSource, TKey>(
             this ReadOnlyObservableCollection<TSource> source, Func<TSource, TKey> keySelector)
-            where TSource : IEquatable<TSource>, INotifyPropertyChanged
+            where TSource : INotifyPropertyChanged
             where TKey : IComparable
         {
             return OrderBy(new InputCollectionWrapper<TSource>(source), keySelector);
         }
         public static ContinuousCollection<TSource> ThenBy<TSource, TKey>(
             this ObservableCollection<TSource> source, Func<TSource, TKey> keySelector)
-            where TSource : IEquatable<TSource>, INotifyPropertyChanged
+            where TSource : INotifyPropertyChanged
             where TKey : IComparable
         {
             return OrderBy(source, keySelector);
         }
         public static ContinuousCollection<TSource> ThenBy<TSource, TKey>(
             this ReadOnlyObservableCollection<TSource> source, Func<TSource, TKey> keySelector)
-            where TSource : IEquatable<TSource>, INotifyPropertyChanged
+            where TSource : INotifyPropertyChanged
             where TKey : IComparable
         {
             return OrderBy(source, keySelector);
@@ -267,7 +267,7 @@ namespace ContinuousLinq
 
         private static ContinuousCollection<TResult> SelectMany<TSource, TResult>(
             InputCollectionWrapper<TSource> source, Func<TSource, IEnumerable<TResult>> selector)
-            where TSource : IEquatable<TSource>, INotifyPropertyChanged
+            where TSource :  INotifyPropertyChanged
         {
             ContinuousCollection<TResult> output = new ContinuousCollection<TResult>();
             new SelectingManyViewAdapter<TSource, TResult>(source, output, selector);
@@ -277,13 +277,13 @@ namespace ContinuousLinq
 
         public static ContinuousCollection<TResult> SelectMany<TSource, TResult>(
             this ObservableCollection<TSource> source, Func<TSource, IEnumerable<TResult>> selector)
-            where TSource : IEquatable<TSource>, INotifyPropertyChanged
+            where TSource : INotifyPropertyChanged
         {
             return SelectMany(new InputCollectionWrapper<TSource>(source), selector);
         }
         public static ContinuousCollection<TResult> SelectMany<TSource, TResult>(
             this ReadOnlyObservableCollection<TSource> source, Func<TSource, IEnumerable<TResult>> selector)
-            where TSource : IEquatable<TSource>, INotifyPropertyChanged
+            where TSource :  INotifyPropertyChanged
         {
             return SelectMany(new InputCollectionWrapper<TSource>(source), selector);
         }
