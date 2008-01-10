@@ -18,7 +18,7 @@ namespace ContinuousLinq
         ViewAdapter<TSource, GroupedContinuousCollection<TKey, TElement>>
             where TSource : IEquatable<TSource>, INotifyPropertyChanged
             where TKey : IComparable
-            where TElement : IEquatable<TElement>
+            
     {
         private delegate GroupedContinuousCollection<TKey, TElement> CreateGroupDelegate(TKey theKey, IEqualityComparer<TKey> comparer);
 

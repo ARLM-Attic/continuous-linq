@@ -11,7 +11,7 @@ namespace ContinuousLinq
     /// <typeparam name="TSource"></typeparam>
     /// <typeparam name="TResult"></typeparam>
     internal sealed class SelectingViewAdapter<TSource, TResult> :
-        ViewAdapter<TSource, TResult> where TSource : IEquatable<TSource>, INotifyPropertyChanged
+        ViewAdapter<TSource, TResult> where TSource : INotifyPropertyChanged
     {
         private readonly Func<TSource, TResult> _func;
 
