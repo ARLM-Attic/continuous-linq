@@ -86,7 +86,7 @@ namespace ContinuousLinq
         #region OrderByDescending
         private static ContinuousCollection<TSource> OrderByDescending<TSource, TKey>(
             InputCollectionWrapper<TSource> source, Func<TSource, TKey> keySelector)
-            where TSource : IEquatable<TSource>, INotifyPropertyChanged
+            where TSource :  INotifyPropertyChanged
             where TKey : IComparable
         {
             Trace.WriteLine("Ordering Observable Collection (Descending).");
@@ -99,28 +99,28 @@ namespace ContinuousLinq
 
         public static ContinuousCollection<TSource> OrderByDescending<TSource, TKey>(
             this ObservableCollection<TSource> source, Func<TSource, TKey> keySelector)
-            where TSource : IEquatable<TSource>, INotifyPropertyChanged
+            where TSource : INotifyPropertyChanged
             where TKey : IComparable
         {
             return OrderByDescending(new InputCollectionWrapper<TSource>(source), keySelector);
         }
         public static ContinuousCollection<TSource> OrderByDescending<TSource, TKey>(
             this ReadOnlyObservableCollection<TSource> source, Func<TSource, TKey> keySelector)
-            where TSource : IEquatable<TSource>, INotifyPropertyChanged
+            where TSource :  INotifyPropertyChanged
             where TKey : IComparable
         {
             return OrderByDescending(new InputCollectionWrapper<TSource>(source), keySelector);
         }
         public static ContinuousCollection<TSource> ThenByDescending<TSource, TKey>(
             this ObservableCollection<TSource> source, Func<TSource, TKey> keySelector)
-            where TSource : IEquatable<TSource>, INotifyPropertyChanged
+            where TSource :  INotifyPropertyChanged
             where TKey : IComparable
         {
             return OrderByDescending(source, keySelector);
         }
         public static ContinuousCollection<TSource> ThenByDescending<TSource, TKey>(
             this ReadOnlyObservableCollection<TSource> source, Func<TSource, TKey> keySelector)
-            where TSource : IEquatable<TSource>, INotifyPropertyChanged
+            where TSource :  INotifyPropertyChanged
             where TKey : IComparable
         {
             return OrderByDescending(source, keySelector);
@@ -134,9 +134,9 @@ namespace ContinuousLinq
             Func<TSource, TElement> elementSelector,
             IEqualityComparer<TKey> comparer)
 
-            where TSource : IEquatable<TSource>, INotifyPropertyChanged
+            where TSource :  INotifyPropertyChanged
             where TKey: IComparable
-            where TElement : IEquatable<TElement>
+            
         {
             ContinuousCollection<GroupedContinuousCollection<TKey, TElement>> output =
                 new ContinuousCollection<GroupedContinuousCollection<TKey, TElement>>();
@@ -153,7 +153,7 @@ namespace ContinuousLinq
         public static ContinuousCollection<GroupedContinuousCollection<TKey, TSource>> GroupBy<TSource, TKey>(
             this ObservableCollection<TSource> source,
             Func<TSource, TKey> keySelector)
-            where TSource : IEquatable<TSource>, INotifyPropertyChanged
+            where TSource : INotifyPropertyChanged
             where TKey : IComparable
         {
             return GroupBy(source, keySelector, (IEqualityComparer<TKey>)null);
@@ -162,7 +162,7 @@ namespace ContinuousLinq
         public static ContinuousCollection<GroupedContinuousCollection<TKey, TSource>> GroupBy<TSource, TKey>(
             this ReadOnlyObservableCollection<TSource> source,
             Func<TSource, TKey> keySelector)
-            where TSource : IEquatable<TSource>, INotifyPropertyChanged
+            where TSource : INotifyPropertyChanged
             where TKey : IComparable
         {
             return GroupBy(source, keySelector, (IEqualityComparer<TKey>)null);
@@ -172,7 +172,7 @@ namespace ContinuousLinq
             this ObservableCollection<TSource> source,
             Func<TSource, TKey> keySelector,
             IEqualityComparer<TKey> comparer)
-            where TSource : IEquatable<TSource>, INotifyPropertyChanged
+            where TSource : INotifyPropertyChanged
             where TKey : IComparable
         {
             Func<TSource, TSource> elementSelector = IdentitySelector<TSource>;
@@ -183,7 +183,7 @@ namespace ContinuousLinq
             this ReadOnlyObservableCollection<TSource> source,
             Func<TSource, TKey> keySelector,
             IEqualityComparer<TKey> comparer)
-            where TSource : IEquatable<TSource>, INotifyPropertyChanged
+            where TSource :  INotifyPropertyChanged
             where TKey : IComparable
         {
             Func<TSource, TSource> elementSelector = IdentitySelector<TSource>;
@@ -194,9 +194,8 @@ namespace ContinuousLinq
             this ObservableCollection<TSource> source,
             Func<TSource, TKey> keySelector,
             Func<TSource, TElement> elementSelector)
-            where TSource : IEquatable<TSource>, INotifyPropertyChanged
+            where TSource :  INotifyPropertyChanged
             where TKey : IComparable
-            where TElement : IEquatable<TElement>
         {
             return GroupBy(source, keySelector, elementSelector, null);
         }
@@ -205,9 +204,8 @@ namespace ContinuousLinq
             this ReadOnlyObservableCollection<TSource> source,
             Func<TSource, TKey> keySelector,
             Func<TSource, TElement> elementSelector)
-            where TSource : IEquatable<TSource>, INotifyPropertyChanged
+            where TSource :  INotifyPropertyChanged
             where TKey : IComparable
-            where TElement : IEquatable<TElement>
         {
             return GroupBy(source, keySelector, elementSelector, null);
         }
@@ -217,9 +215,8 @@ namespace ContinuousLinq
             Func<TSource, TKey> keySelector,
             Func<TSource, TElement> elementSelector,
             IEqualityComparer<TKey> comparer)
-            where TSource : IEquatable<TSource>, INotifyPropertyChanged
+            where TSource : INotifyPropertyChanged
             where TKey : IComparable
-            where TElement : IEquatable<TElement>
         {
             return GroupBy(new InputCollectionWrapper<TSource>(source), keySelector, elementSelector, comparer);
         }
@@ -229,9 +226,8 @@ namespace ContinuousLinq
             Func<TSource, TKey> keySelector,
             Func<TSource, TElement> elementSelector,
             IEqualityComparer<TKey> comparer)
-            where TSource : IEquatable<TSource>, INotifyPropertyChanged
+            where TSource :  INotifyPropertyChanged
             where TKey : IComparable
-            where TElement : IEquatable<TElement>
         {
             return GroupBy(new InputCollectionWrapper<TSource>(source), keySelector, elementSelector, comparer);
         }
@@ -240,7 +236,7 @@ namespace ContinuousLinq
         #region Select
         private static ContinuousCollection<TResult> Select<TSource, TResult>(
             InputCollectionWrapper<TSource> source, Func<TSource, TResult> selector)
-            where TSource : IEquatable<TSource>, INotifyPropertyChanged
+            where TSource :  INotifyPropertyChanged
         {
             ContinuousCollection<TResult> output = new ContinuousCollection<TResult>();
             new SelectingViewAdapter<TSource, TResult>(source, output, selector);
@@ -250,14 +246,14 @@ namespace ContinuousLinq
 
         public static ContinuousCollection<TResult> Select<TSource, TResult>(
             this ObservableCollection<TSource> source, Func<TSource, TResult> selector)
-            where TSource : IEquatable<TSource>, INotifyPropertyChanged
+            where TSource :  INotifyPropertyChanged
         {
             return Select(new InputCollectionWrapper<TSource>(source), selector);
         }
 
         public static ContinuousCollection<TResult> Select<TSource, TResult>(
             this ReadOnlyObservableCollection<TSource> source, Func<TSource, TResult> selector)
-            where TSource : IEquatable<TSource>, INotifyPropertyChanged
+            where TSource : INotifyPropertyChanged
         {
             return Select(new InputCollectionWrapper<TSource>(source), selector);
         }
