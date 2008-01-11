@@ -16,7 +16,7 @@ namespace ContinuousLinq
     /// <typeparam name="TElement"></typeparam>
     internal sealed class GroupingViewAdapter<TSource, TKey, TElement> :
         ViewAdapter<TSource, GroupedContinuousCollection<TKey, TElement>>
-            where TSource : IEquatable<TSource>, INotifyPropertyChanged
+            where TSource : INotifyPropertyChanged
             where TKey : IComparable
             
     {
