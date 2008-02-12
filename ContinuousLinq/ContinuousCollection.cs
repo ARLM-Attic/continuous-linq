@@ -30,10 +30,21 @@ namespace ContinuousLinq
         private object _sourceAdapter;
 
         /// <summary>
-        /// Default constructor, initializes the reader/writer lock and obtains
-        /// a reference to the dispatcher.
+        /// Default constructor, initializes a new list and obtains a reference
+        /// to the dispatcher.
         /// </summary>
         public ContinuousCollection()
+        {
+            //_dispatcher = Dispatcher.CurrentDispatcher;
+            _dispatcher = Dispatcher.FromThread(Thread.CurrentThread);
+        }
+
+        /// <summary>
+        /// Initializes a new ContinuouseCollection using elements copied from
+        /// the specified list and obtains a reference to the dispatcher.
+        /// </summary>
+        public ContinuousCollection(List<T> list)
+            : base(list)
         {
             //_dispatcher = Dispatcher.CurrentDispatcher;
             _dispatcher = Dispatcher.FromThread(Thread.CurrentThread);
