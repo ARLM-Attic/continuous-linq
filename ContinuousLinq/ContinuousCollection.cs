@@ -2,6 +2,8 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Windows.Threading;
 using System.Threading;
+using System.Diagnostics;
+using System.ComponentModel;
 
 namespace ContinuousLinq
 {
@@ -17,6 +19,10 @@ namespace ContinuousLinq
     /// <typeparam name="T">Type of element contained within the collection</typeparam>
     public class ContinuousCollection<T> : ObservableCollection<T>
     {
+        public delegate void CollectionItemChangedDelegate(T item, string propertyName);
+
+        public event CollectionItemChangedDelegate CollectionItemChanged;
+
         // Maybe later this will be changeable:
         private readonly DispatcherPriority _updatePriority = DispatcherPriority.Normal;
         private readonly Dispatcher _dispatcher;
@@ -126,6 +132,11 @@ namespace ContinuousLinq
         {
             if (NoInvoke())
             {
+                foreach (T item in this)
+                {
+                    INotifyPropertyChanged propChanged = item as INotifyPropertyChanged;
+                    propChanged.PropertyChanged -= pchangeItem_PropertyChanged;
+                }
                 base.ClearItems();
             }
             else
@@ -142,6 +153,9 @@ namespace ContinuousLinq
         /// <param name="item">Item being inserted</param>
         protected override void InsertItem(int index, T item)
         {
+            //Trace.WriteLine("***** INSERT!!!! ****");
+            INotifyPropertyChanged pchangeItem = item as INotifyPropertyChanged;
+            pchangeItem.PropertyChanged += pchangeItem_PropertyChanged;
             if (NoInvoke())
             {
                 base.InsertItem(index, item);
@@ -151,6 +165,12 @@ namespace ContinuousLinq
                 _dispatcher.Invoke(_updatePriority,
                     new IndexItemDelegate(InsertItem), index, item);
             }
+        }
+
+        void pchangeItem_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (CollectionItemChanged != null)
+                CollectionItemChanged((T)sender, e.PropertyName);
         }
 
         protected override void MoveItem(int oldIndex, int newIndex)
@@ -173,6 +193,8 @@ namespace ContinuousLinq
         /// <param name="index">Index of item to be removed.</param>
         protected override void RemoveItem(int index)
         {
+            INotifyPropertyChanged pchangeItem = this[index] as INotifyPropertyChanged;
+            pchangeItem.PropertyChanged -= pchangeItem_PropertyChanged;
             if (NoInvoke())
             {
                 base.RemoveItem(index);
