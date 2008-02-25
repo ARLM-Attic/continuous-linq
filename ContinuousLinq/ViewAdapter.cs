@@ -23,7 +23,7 @@ namespace ContinuousLinq
         private readonly Dictionary<Tin, WeakPropertyChangedHandler> _handlerMap = 
             new Dictionary<Tin, WeakPropertyChangedHandler>();
 
-        public ViewAdapter(InputCollectionWrapper<Tin> input,
+        protected ViewAdapter(InputCollectionWrapper<Tin> input,
             ContinuousCollection<Tout> output)
         {
             if (input == null)
@@ -58,7 +58,7 @@ namespace ContinuousLinq
         /// <param name="item"></param>
         private void SubscribeToItemNoCheck(Tin item)
         {
-            _handlerMap[item] = new WeakPropertyChangedHandler((INotifyPropertyChanged)item, _propertyChangedDelegate);
+            _handlerMap[item] = new WeakPropertyChangedHandler(item, _propertyChangedDelegate);
         }
 
         /// <summary>

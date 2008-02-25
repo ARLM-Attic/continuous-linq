@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Windows.Threading;
 using System.Threading;
-using System.Diagnostics;
 using System.ComponentModel;
 
 namespace ContinuousLinq
@@ -33,7 +32,6 @@ namespace ContinuousLinq
         
 
         // For CLINQ use only (see comments in ViewAdapter):
-        private object _sourceAdapter;
 
         /// <summary>
         /// Default constructor, initializes a new list and obtains a reference
@@ -56,11 +54,7 @@ namespace ContinuousLinq
             _dispatcher = Dispatcher.FromThread(Thread.CurrentThread);
         }
 
-        internal object SourceAdapter
-        {
-            get { return _sourceAdapter; }
-            set { _sourceAdapter = value; }
-        }
+        internal object SourceAdapter { get; set; }
 
         public int BinarySearch(T item)
         {

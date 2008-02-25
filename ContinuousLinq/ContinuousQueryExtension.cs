@@ -156,7 +156,7 @@ namespace ContinuousLinq
             where TSource : INotifyPropertyChanged
             where TKey : IComparable
         {
-            return GroupBy(source, keySelector, (IEqualityComparer<TKey>)null);
+            return GroupBy(source, keySelector, null);
         }
         
         public static ContinuousCollection<GroupedContinuousCollection<TKey, TSource>> GroupBy<TSource, TKey>(
@@ -165,7 +165,7 @@ namespace ContinuousLinq
             where TSource : INotifyPropertyChanged
             where TKey : IComparable
         {
-            return GroupBy(source, keySelector, (IEqualityComparer<TKey>)null);
+            return GroupBy(source, keySelector, null);
         }
         
         public static ContinuousCollection<GroupedContinuousCollection<TKey, TSource>> GroupBy<TSource, TKey>(
