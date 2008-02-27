@@ -20,18 +20,30 @@ namespace ContinuousLinq
     {
         public delegate void CollectionItemChangedDelegate(T item, string propertyName);
 
-        public event CollectionItemChangedDelegate CollectionItemChanged;
+        private event CollectionItemChangedDelegate CollectionItemChangedPrivate;
+        public event CollectionItemChangedDelegate CollectionItemChanged
+        {
+            add
+            {
+                AddOrRemoveListener(value, true);
+            }
+            remove
+            {
+                AddOrRemoveListener(value, false);
+            }
+        }
 
         // Maybe later this will be changeable:
         private readonly DispatcherPriority _updatePriority = DispatcherPriority.Normal;
         private readonly Dispatcher _dispatcher;
+        private readonly Dictionary<INotifyPropertyChanged, WeakPropertyChangedHandler> _handlerMap =
+            new Dictionary<INotifyPropertyChanged, WeakPropertyChangedHandler>();
+
         private delegate void ZeroDelegate();
         private delegate void IndexDelegate(int index);
         private delegate void IndexItemDelegate(int index, T item);
         private delegate void IndexIndexDelegate(int oldIndex, int newIndex);
-        
-
-        // For CLINQ use only (see comments in ViewAdapter):
+        private delegate void AddOrRemoveDelegate(CollectionItemChangedDelegate listener, bool add);
 
         /// <summary>
         /// Default constructor, initializes a new list and obtains a reference
@@ -54,7 +66,8 @@ namespace ContinuousLinq
             _dispatcher = Dispatcher.FromThread(Thread.CurrentThread);
         }
 
-        internal object SourceAdapter { get; set; }
+        // todo move this to a subclass? TBD
+        internal object /*IViewAdapter*/ SourceAdapter { get; set; }
 
         public int BinarySearch(T item)
         {
@@ -67,6 +80,7 @@ namespace ContinuousLinq
             List<T> list = (List<T>)this.Items;
             return list.BinarySearch(item, comparer);
         }
+
         public int BinarySearch(int index, int count, T item, IComparer<T> comparer)
         {
             List<T> list = (List<T>)this.Items;
@@ -118,6 +132,30 @@ namespace ContinuousLinq
             return _dispatcher == null || _dispatcher.CheckAccess();
         }
 
+        private void AddOrRemovePropertyListener(T item, bool add)
+        {
+            // Weak listeners so we can drop collection when not dropping objects.
+            INotifyPropertyChanged listener = item as INotifyPropertyChanged;
+            if (listener == null)
+                return;
+            if (add)
+            {
+                if (_handlerMap.ContainsKey(listener) == false)
+                {
+                    _handlerMap[listener] = new WeakPropertyChangedHandler(listener, pchangeItem_PropertyChanged);
+                }
+            }
+            else
+            {
+                WeakPropertyChangedHandler handler;
+                if (_handlerMap.TryGetValue(listener, out handler))
+                {
+                    handler.Detach();
+                    _handlerMap.Remove(listener);
+                }
+            }
+        }
+
         /// <summary>
         /// Overridden method that does an "items reset" notification on the dispatch thread
         /// so that bound GUI elements will be aware when this collection is emptied.
@@ -128,8 +166,7 @@ namespace ContinuousLinq
             {
                 foreach (T item in this)
                 {
-                    INotifyPropertyChanged propChanged = item as INotifyPropertyChanged;
-                    propChanged.PropertyChanged -= pchangeItem_PropertyChanged;
+                    AddOrRemovePropertyListener(item, false);
                 }
                 base.ClearItems();
             }
@@ -148,10 +185,9 @@ namespace ContinuousLinq
         protected override void InsertItem(int index, T item)
         {
             //Trace.WriteLine("***** INSERT!!!! ****");
-            INotifyPropertyChanged pchangeItem = item as INotifyPropertyChanged;
-            pchangeItem.PropertyChanged += pchangeItem_PropertyChanged;
             if (NoInvoke())
             {
+                AddOrRemovePropertyListener(item, true);
                 base.InsertItem(index, item);
             }
             else
@@ -161,10 +197,37 @@ namespace ContinuousLinq
             }
         }
 
-        void pchangeItem_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        private void pchangeItem_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (CollectionItemChanged != null)
-                CollectionItemChanged((T)sender, e.PropertyName);
+            if (NoInvoke())
+            {
+                if (CollectionItemChangedPrivate != null)
+                    CollectionItemChangedPrivate((T)sender, e.PropertyName);
+            }
+            else
+            {
+                _dispatcher.Invoke(_updatePriority,
+                                   new PropertyChangedEventHandler(pchangeItem_PropertyChanged), sender, e);
+            }
+        }
+
+        private void AddOrRemoveListener(CollectionItemChangedDelegate listener, bool add)
+        {
+            if (NoInvoke())
+            {
+                if (add)
+                {
+                    CollectionItemChangedPrivate += listener;
+                }
+                else
+                {
+                    CollectionItemChangedPrivate -= listener;
+                }
+            }
+            else
+            {
+                _dispatcher.Invoke(_updatePriority, new AddOrRemoveDelegate(AddOrRemoveListener), listener, add);
+            }
         }
 
         protected override void MoveItem(int oldIndex, int newIndex)
@@ -187,10 +250,9 @@ namespace ContinuousLinq
         /// <param name="index">Index of item to be removed.</param>
         protected override void RemoveItem(int index)
         {
-            INotifyPropertyChanged pchangeItem = this[index] as INotifyPropertyChanged;
-            pchangeItem.PropertyChanged -= pchangeItem_PropertyChanged;
             if (NoInvoke())
             {
+                AddOrRemovePropertyListener(this[index], false);
                 base.RemoveItem(index);
             }
             else
@@ -210,6 +272,8 @@ namespace ContinuousLinq
         {
             if (NoInvoke())
             {
+                AddOrRemovePropertyListener(this[index], false);
+                AddOrRemovePropertyListener(item, true);
                 base.SetItem(index, item);
             }
             else
