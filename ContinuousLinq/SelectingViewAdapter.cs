@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
 
@@ -10,8 +11,8 @@ namespace ContinuousLinq
     /// </summary>
     /// <typeparam name="TSource"></typeparam>
     /// <typeparam name="TResult"></typeparam>
-    internal sealed class SelectingViewAdapter<TSource, TResult> :
-        ViewAdapter<TSource, TResult> where TSource : INotifyPropertyChanged
+    internal sealed class SelectingViewAdapter<TSource, TResult> : ViewAdapter<TSource, TResult> 
+        where TSource : class, INotifyPropertyChanged
     {
         private readonly Func<TSource, TResult> _func;
 
@@ -33,8 +34,9 @@ namespace ContinuousLinq
         protected override void OnCollectionItemPropertyChanged(TSource item, string propertyName)
         {
             // Damn, no index.
-            int index = _input.InnerAsList.IndexOf(item);
-            _output[index] = _func(_input.InnerAsList[index]);
+            IList<TSource> list = _input.InnerAsList;
+            int index = list.IndexOf(item);
+            _output[index] = _func(list[index]);
         }
 
         protected override void OnInputCollectionChanged(NotifyCollectionChangedEventArgs e)
@@ -42,7 +44,7 @@ namespace ContinuousLinq
             if (e.Action == NotifyCollectionChangedAction.Replace)
             {
                 int index = e.OldStartingIndex;
-                _output[index] = _func(_input.InnerAsList[index]);
+                _output[index] = _func(e.NewItems[0] as TSource);
             }
             else
             {
@@ -62,5 +64,14 @@ namespace ContinuousLinq
             SubscribeToItem(newItem);
             _output.Insert(index, _func(newItem));
         }
+
+        /*public override void ReEvaluate()
+        {
+            IList<TSource> innerAsList = _input.InnerAsList;
+            for (int i = 0, n = innerAsList.Count; i < n; i++)
+            {
+                _output[i] = _func(innerAsList[i]);
+            }
+        }*/
     }
 }
