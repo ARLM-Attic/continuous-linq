@@ -43,11 +43,11 @@ namespace ContinuousLinq
             {
                 if (!_predicate(item))
                 {
-                    _output.Remove(item);                    
+                    this.OutputCollection.Remove(item);                    
                 }
-                else if (!_output.Contains(item))
+                else if (!this.OutputCollection.Contains(item))
                 {
-                    _output.Add(item);
+                    this.OutputCollection.Add(item);
                 }
             }
         }
@@ -65,7 +65,7 @@ namespace ContinuousLinq
             SubscribeToItem(newItem);
             if (_predicate == null || _predicate(newItem))
             {
-                _output.Add(newItem);
+                this.OutputCollection.Add(newItem);
             }
         }
 
@@ -80,7 +80,7 @@ namespace ContinuousLinq
         protected override bool RemoveItem(T existingItem, int index)
         {
             UnsubscribeFromItem(existingItem);
-            bool hadIt = _output.Remove(existingItem);
+            bool hadIt = this.OutputCollection.Remove(existingItem);
             return hadIt;
         }
     }

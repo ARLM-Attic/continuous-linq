@@ -47,7 +47,7 @@ namespace ContinuousLinq
             _comparer = comparer;
             _dispatcher = Dispatcher.CurrentDispatcher;
 
-            foreach (TSource item in _input.InnerAsList)
+            foreach (TSource item in source.InnerAsList)
             {
                 AddItem(item);
             }
@@ -78,7 +78,7 @@ namespace ContinuousLinq
                 }
                 // Maybe later use output's dispatch priority?
                 newGroup.Add(_elementSelector(item));
-                _output.Add(newGroup);
+                this.OutputCollection.Add(newGroup);
                 _groupMap[theKey] = newGroup;
             }
         }
@@ -98,7 +98,7 @@ namespace ContinuousLinq
         {
             if (group.Count == 0)
             {
-                _output.Remove(group);
+                this.OutputCollection.Remove(group);
                 _groupMap.Remove(group.Key);
             }
         }
@@ -110,7 +110,7 @@ namespace ContinuousLinq
             // Remove the item from the appropriate group.
             // Do it the hard way in case a property change was missed.
             TElement element = _elementSelector(item);
-            foreach (GroupedContinuousCollection<TKey, TElement> scanGroup in _output)
+            foreach (GroupedContinuousCollection<TKey, TElement> scanGroup in this.OutputCollection)
             {
                 if (scanGroup.Remove(element))
                 {
@@ -127,7 +127,7 @@ namespace ContinuousLinq
             //  Trace.WriteLine("[GVA] Property Changed.");
             TKey theKey = _keySelector(item);
             TElement element = _elementSelector(item);
-            foreach (GroupedContinuousCollection<TKey, TElement> oldGroup in _output)
+            foreach (GroupedContinuousCollection<TKey, TElement> oldGroup in this.OutputCollection)
             {
                 if (oldGroup.Contains(element))
                 {

@@ -27,13 +27,12 @@ namespace ContinuousLinq
         {
             if (compareFunc == null)
                 throw new ArgumentNullException("compareFunc");
-            SetComparerChain(compareFunc);
+            SetComparerChain(compareFunc, input.SourceAdapter as SortingViewAdapter<TSource>);
             FullSort();
         }
 
-        private void SetComparerChain(IComparer<TSource> compareFunc)
+        private void SetComparerChain(IComparer<TSource> compareFunc, SortingViewAdapter<TSource> previous)
         {
-            SortingViewAdapter<TSource> previous = _input.SourceAdapter as SortingViewAdapter<TSource>;
             if (previous != null)
             {
                 previous._isLastInChain = false;
@@ -48,11 +47,11 @@ namespace ContinuousLinq
         private void FullSort()
         {
             Trace.WriteLine("[SVA] Full sort.");
-            List<TSource> sortedList = new List<TSource>(_input.InnerAsList);
+            List<TSource> sortedList = new List<TSource>(this.InputCollection);
             sortedList.Sort(_compareFunc);
 
-            _output.Clear();
-            _output.AddRange(sortedList);
+            this.OutputCollection.Clear();
+            this.OutputCollection.AddRange(sortedList);
         }
 
         protected override void OnCollectionItemPropertyChanged(TSource item, string propertyName)
@@ -62,7 +61,7 @@ namespace ContinuousLinq
             // Last sorter in line will do the sorting.
             if (_isLastInChain)
             {
-                if (_output.Remove(item))
+                if (this.OutputCollection.Remove(item))
                 {
                     InsertItemInSortOrder(item);
                 }
@@ -76,14 +75,14 @@ namespace ContinuousLinq
         /// <param name="item"></param>
         private void InsertItemInSortOrder(TSource item)
         {
-            int index = _output.BinarySearch(item, _compareFunc);
+            int index = this.OutputCollection.BinarySearch(item, _compareFunc);
             if (index < 0)
             {
                 index = ~index;
             }
 
             Trace.WriteLine("[SVA] New Item (" + item + ") inserted @ index " + index);
-            _output.Insert(index, item);
+            this.OutputCollection.Insert(index, item);
         }
 
         protected override void OnInputCollectionChanged(NotifyCollectionChangedEventArgs e)
@@ -96,7 +95,7 @@ namespace ContinuousLinq
         {
             Trace.WriteLine("\t[SVA] Source Deleted Item: " + deleteItem);
             UnsubscribeFromItem(deleteItem);
-            bool hadIt = _output.Remove(deleteItem);
+            bool hadIt = this.OutputCollection.Remove(deleteItem);
             return hadIt;
         }
 
@@ -112,7 +111,7 @@ namespace ContinuousLinq
             }
             else
             {
-                _output.Insert(index, newItem);
+                this.OutputCollection.Insert(index, newItem);
             }
         }
 

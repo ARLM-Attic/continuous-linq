@@ -16,8 +16,8 @@ namespace ContinuousLinq
     internal abstract class ViewAdapter<Tin, Tout>
         where Tin : INotifyPropertyChanged
     {
-        protected InputCollectionWrapper<Tin> _input;
-        protected ContinuousCollection<Tout> _output;
+        private readonly InputCollectionWrapper<Tin> _input;
+        private readonly ContinuousCollection<Tout> _output;
         private readonly NotifyCollectionChangedEventHandler _collectionChangedDelegate;
         private readonly PropertyChangedEventHandler _propertyChangedDelegate;
         private readonly Dictionary<Tin, WeakPropertyChangedHandler> _handlerMap = 
@@ -44,7 +44,7 @@ namespace ContinuousLinq
                                            {
                                                OnCollectionItemPropertyChanged((Tin)sender, args.PropertyName);
                                            };
-            new WeakCollectionChangedHandler(_input.InnerAsNotifier, _collectionChangedDelegate);
+            new WeakCollectionChangedHandler(input.InnerAsNotifier, _collectionChangedDelegate);
 
             foreach (Tin item in input.InnerAsList)
             {
@@ -92,9 +92,9 @@ namespace ContinuousLinq
         /// <summary>
         /// A pointer to the collection to which this adapter is listening
         /// </summary>
-        internal InputCollectionWrapper<Tin> InputCollection
+        internal IList<Tin> InputCollection
         {
-            get { return _input; }
+            get { return _input.InnerAsList; }
         }
 
         /// <summary>

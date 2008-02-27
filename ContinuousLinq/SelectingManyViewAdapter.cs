@@ -26,10 +26,10 @@ namespace ContinuousLinq
 
             if (func == null)
                 throw new ArgumentNullException("func");
-            foreach (TSource inItem in _input.InnerAsList)
+            foreach (TSource inItem in input.InnerAsList)
             {
                 List<TResult> outList = new List<TResult>(func(inItem));
-                _output.AddRange(outList);
+                output.AddRange(outList);
                 _collectionLengths.Add(outList.Count);
             }
         }
@@ -54,21 +54,21 @@ namespace ContinuousLinq
             if (newCount < oldCount)
             {
                 int diff = oldCount - newCount;
-                _output.RemoveRange(outIndex + newCount, diff);
+                this.OutputCollection.RemoveRange(outIndex + newCount, diff);
             }
             else if (newCount > oldCount)
             {
                 int diff = newCount - oldCount;
-                _output.InsertRange(outIndex + oldCount, newList.GetRange(oldCount, diff));
+                this.OutputCollection.InsertRange(outIndex + oldCount, newList.GetRange(oldCount, diff));
                 newList.RemoveRange(oldCount, diff);
             }
 
-            _output.ReplaceRange(outIndex, newList);
+            this.OutputCollection.ReplaceRange(outIndex, newList);
         }
 
         protected override void OnCollectionItemPropertyChanged(TSource item, string propertyName)
         {
-            int index = _input.InnerAsList.IndexOf(item);
+            int index = this.InputCollection.IndexOf(item);
             ReplacedOrChanged(item, index);
         }
 
@@ -90,7 +90,7 @@ namespace ContinuousLinq
             UnsubscribeFromItem(deleteItem);
             int outIndex = CountUntilIndex(inIndex);
             int count = _collectionLengths[inIndex];
-            _output.RemoveRange(outIndex, count);
+            this.OutputCollection.RemoveRange(outIndex, count);
             _collectionLengths.RemoveAt(inIndex);
             return true;
         }
@@ -100,7 +100,7 @@ namespace ContinuousLinq
             SubscribeToItem(newItem);
             int outIndex = CountUntilIndex(inIndex);
             List<TResult> outList = new List<TResult>(_func(newItem));
-            _output.InsertRange(outIndex, outList);
+            this.OutputCollection.InsertRange(outIndex, outList);
             _collectionLengths.Insert(inIndex, outList.Count);
         }
     }
