@@ -12,7 +12,7 @@ namespace ContinuousLinq
     /// <typeparam name="TSource"></typeparam>
     /// <typeparam name="TResult"></typeparam>
     internal sealed class SelectingViewAdapter<TSource, TResult> : ViewAdapter<TSource, TResult> 
-        where TSource : class, INotifyPropertyChanged
+        where TSource : INotifyPropertyChanged
     {
         private readonly Func<TSource, TResult> _func;
 
@@ -44,7 +44,7 @@ namespace ContinuousLinq
             if (e.Action == NotifyCollectionChangedAction.Replace)
             {
                 int index = e.OldStartingIndex;
-                _output[index] = _func(e.NewItems[0] as TSource);
+                _output[index] = _func((TSource)e.NewItems[0]);
             }
             else
             {
