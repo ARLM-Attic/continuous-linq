@@ -22,7 +22,7 @@ namespace ContinuousLinq
         private bool _isLastInChain = true;
 
         public SortingViewAdapter(InputCollectionWrapper<TSource> input,
-            ContinuousCollection<TSource> output, IComparer<TSource> compareFunc)
+            ReadOnlyContinuousCollection<TSource> output, IComparer<TSource> compareFunc)
             : base(input, output)
         {
             if (compareFunc == null)

@@ -17,14 +17,14 @@ namespace ContinuousLinq
         where Tin : INotifyPropertyChanged
     {
         private readonly InputCollectionWrapper<Tin> _input;
-        private readonly ContinuousCollection<Tout> _output;
+        private readonly OutputCollectionWrapper<Tout> _output;
         private readonly NotifyCollectionChangedEventHandler _collectionChangedDelegate;
         private readonly PropertyChangedEventHandler _propertyChangedDelegate;
         private readonly Dictionary<Tin, WeakPropertyChangedHandler> _handlerMap = 
             new Dictionary<Tin, WeakPropertyChangedHandler>();
 
         protected ViewAdapter(InputCollectionWrapper<Tin> input,
-            ContinuousCollection<Tout> output)
+            ReadOnlyContinuousCollection<Tout> output)
         {
             if (input == null)
                 throw new ArgumentNullException("input");
@@ -32,7 +32,7 @@ namespace ContinuousLinq
                 throw new ArgumentNullException("output");
 
             _input = input;
-            _output = output;
+            _output = new OutputCollectionWrapper<Tout>(output);
 
             output.SourceAdapter = this;
             // Must be referenced by this instance:
@@ -46,7 +46,7 @@ namespace ContinuousLinq
                                            };
             new WeakCollectionChangedHandler(input.InnerAsNotifier, _collectionChangedDelegate);
 
-            foreach (Tin item in input.InnerAsList)
+            foreach (Tin item in this.InputCollection)
             {
                 SubscribeToItemNoCheck(item);
             }
@@ -101,7 +101,7 @@ namespace ContinuousLinq
         /// A pointer to the collection to which all changes made by this adapter are
         /// propagated
         /// </summary>
-        internal ContinuousCollection<Tout> OutputCollection
+        internal OutputCollectionWrapper<Tout> OutputCollection
         {
             get { return _output; }
         }

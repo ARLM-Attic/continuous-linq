@@ -17,7 +17,7 @@ namespace ContinuousLinq
         private readonly Func<TSource, TResult> _func;
 
         public SelectingViewAdapter(InputCollectionWrapper<TSource> input,
-            ContinuousCollection<TResult> output,
+            ReadOnlyContinuousCollection<TResult> output,
             Func<TSource, TResult> func)
             : base(input, output)
         {
@@ -25,9 +25,9 @@ namespace ContinuousLinq
 
             if (func == null)
                 throw new ArgumentNullException("func");
-            foreach (TSource item in input.InnerAsList)
+            foreach (TSource item in this.InputCollection)
             {
-                output.Add(func(item));
+                this.OutputCollection.Add(func(item));
             }
         }
 

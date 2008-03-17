@@ -17,16 +17,16 @@ namespace ContinuousLinq
         private readonly Func<T, bool> _predicate;
 
         public FilteringViewAdapter(InputCollectionWrapper<T> input,
-            ContinuousCollection<T> output,
+            ReadOnlyContinuousCollection<T> output,
             Func<T, bool> predicateFunc) : base(input, output)
         {
             Trace.WriteLine("[FVA] Init.");
             _predicate = predicateFunc;
 
-            foreach (T item in input.InnerAsList)
+            foreach (T item in this.InputCollection)
             {
                 if (_predicate(item))
-                    output.Add(item);
+                    this.OutputCollection.Add(item);
             }
         }
 

@@ -13,7 +13,7 @@ namespace ContinuousLinq
     /// <typeparam name="TKey"></typeparam>
     /// <typeparam name="TElement"></typeparam>
     public class GroupedContinuousCollection<TKey, TElement> :
-        ContinuousCollection<TElement>, IGrouping<TKey, TElement>,
+        ReadOnlyContinuousCollection<TElement>, IGrouping<TKey, TElement>,
         IEquatable<GroupedContinuousCollection<TKey, TElement>>
     {
         private readonly TKey _key;

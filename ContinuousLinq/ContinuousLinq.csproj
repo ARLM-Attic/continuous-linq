@@ -16,6 +16,8 @@
     <SccLocalPath>SAK</SccLocalPath>
     <SccAuxPath>SAK</SccAuxPath>
     <SccProvider>SAK</SccProvider>
+    <StartupObject>
+    </StartupObject>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -53,6 +55,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ContinuousQueryExtension.cs" />
+    <Compile Include="OutputCollectionWrapper.cs" />
+    <Compile Include="ReadOnlyContinuousCollection.cs" />
     <Compile Include="SelectingManyViewAdapter.cs" />
     <Compile Include="InputCollectionWrapper.cs" />
     <Compile Include="SelectingViewAdapter.cs" />

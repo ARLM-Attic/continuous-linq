@@ -20,17 +20,14 @@ namespace ContinuousLinq
             where TKey : IComparable
             
     {
-        private delegate GroupedContinuousCollection<TKey, TElement> CreateGroupDelegate(TKey theKey, IEqualityComparer<TKey> comparer);
-
         private readonly Func<TSource, TKey> _keySelector;
         private readonly Func<TSource, TElement> _elementSelector;
         private readonly IEqualityComparer<TKey> _comparer;
-        private readonly Dispatcher _dispatcher;
         private readonly Dictionary<TKey, GroupedContinuousCollection<TKey, TElement>> _groupMap = new Dictionary<TKey, GroupedContinuousCollection<TKey, TElement>>();
 
         public GroupingViewAdapter(
             InputCollectionWrapper<TSource> source,
-            ContinuousCollection<GroupedContinuousCollection<TKey, TElement>> output,
+            ReadOnlyContinuousCollection<GroupedContinuousCollection<TKey, TElement>> output,
             Func<TSource, TKey> keySelector,
             Func<TSource, TElement> elementSelector,
             IEqualityComparer<TKey> comparer)
@@ -45,9 +42,8 @@ namespace ContinuousLinq
                 comparer = EqualityComparer<TKey>.Default;
             }
             _comparer = comparer;
-            _dispatcher = Dispatcher.CurrentDispatcher;
 
-            foreach (TSource item in source.InnerAsList)
+            foreach (TSource item in this.InputCollection)
             {
                 AddItem(item);
             }
@@ -57,35 +53,23 @@ namespace ContinuousLinq
         {
             TKey theKey = _keySelector(item);
             GroupedContinuousCollection<TKey, TElement> outputGroup;
-            if (_groupMap.TryGetValue(theKey, out outputGroup))
-            {
-                // new item belongs in this group
-                outputGroup.Add(_elementSelector(item));
-            }
-            else
+            if (_groupMap.TryGetValue(theKey, out outputGroup) == false)
             {
                 // item belongs in a new group
-                GroupedContinuousCollection<TKey, TElement> newGroup;
-                if (_dispatcher.CheckAccess())
-                {
-                    newGroup = CreateGroup(theKey, _comparer);
-                }
-                else
-                {
-                    newGroup = (GroupedContinuousCollection<TKey, TElement>)_dispatcher.Invoke(
-                                                                                DispatcherPriority.Normal,
-                                                                                new CreateGroupDelegate(CreateGroup), theKey, _comparer);
-                }
+                outputGroup = new GroupedContinuousCollection<TKey, TElement>(theKey, _comparer);
                 // Maybe later use output's dispatch priority?
-                newGroup.Add(_elementSelector(item));
-                this.OutputCollection.Add(newGroup);
-                _groupMap[theKey] = newGroup;
+                this.OutputCollection.Add(outputGroup);
+                _groupMap[theKey] = outputGroup;
             }
-        }
-
-        private static GroupedContinuousCollection<TKey, TElement> CreateGroup(TKey theKey, IEqualityComparer<TKey> comparer)
-        {
-            return new GroupedContinuousCollection<TKey, TElement>(theKey, comparer);
+            try
+            {
+                outputGroup.IsSealed = false;
+                outputGroup.Add(_elementSelector(item));
+            }
+            finally
+            {
+                outputGroup.IsSealed = true;                
+            }
         }
 
         protected override void AddItem(TSource item, int index)
@@ -94,13 +78,24 @@ namespace ContinuousLinq
             AddItem(item);
         }
 
-        private void PostRemove(GroupedContinuousCollection<TKey, TElement> group)
+        private bool RemoveFrom(TElement element, GroupedContinuousCollection<TKey, TElement> group)
         {
+            bool ret;
+            try
+            {
+                group.IsSealed = false;
+                ret = group.Remove(element);
+            }
+            finally
+            {
+                group.IsSealed = true;
+            }
             if (group.Count == 0)
             {
                 this.OutputCollection.Remove(group);
                 _groupMap.Remove(group.Key);
             }
+            return ret;
         }
 
         protected override bool RemoveItem(TSource item, int index)
@@ -112,9 +107,8 @@ namespace ContinuousLinq
             TElement element = _elementSelector(item);
             foreach (GroupedContinuousCollection<TKey, TElement> scanGroup in this.OutputCollection)
             {
-                if (scanGroup.Remove(element))
+                if (RemoveFrom(element, scanGroup))
                 {
-                    PostRemove(scanGroup);
                     hadIt = true;
                     break;
                 }
@@ -133,8 +127,7 @@ namespace ContinuousLinq
                 {
                     if (oldGroup.Key.Equals(theKey) == false)
                     {
-                        oldGroup.Remove(element);
-                        PostRemove(oldGroup);
+                        RemoveFrom(element, oldGroup);
                         AddItem(item);
                     }
                     break;

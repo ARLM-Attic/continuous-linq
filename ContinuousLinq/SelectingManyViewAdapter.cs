@@ -18,7 +18,7 @@ namespace ContinuousLinq
         private readonly List<int> _collectionLengths = new List<int>();
 
         public SelectingManyViewAdapter(InputCollectionWrapper<TSource> input,
-            ContinuousCollection<TResult> output,
+            ReadOnlyContinuousCollection<TResult> output,
             Func<TSource, IEnumerable<TResult>> func)
             : base(input, output)
         {
@@ -26,10 +26,10 @@ namespace ContinuousLinq
 
             if (func == null)
                 throw new ArgumentNullException("func");
-            foreach (TSource inItem in input.InnerAsList)
+            foreach (TSource inItem in this.InputCollection)
             {
                 List<TResult> outList = new List<TResult>(func(inItem));
-                output.AddRange(outList);
+                this.OutputCollection.AddRange(outList);
                 _collectionLengths.Add(outList.Count);
             }
         }
