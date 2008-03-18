@@ -21,7 +21,7 @@ namespace ContinuousLinq
         private bool _isLastInChain = true;
 
         public SortingViewAdapter(InputCollectionWrapper<TSource> input,
-            ReadOnlyContinuousCollection<TSource> output, IComparer<TSource> compareFunc)
+            LinqContinuousCollection<TSource> output, IComparer<TSource> compareFunc)
             : base(input, output)
         {
             if (compareFunc == null)
@@ -32,7 +32,7 @@ namespace ContinuousLinq
 
         private void SetComparerChain(IComparer<TSource> compareFunc)
         {
-            SortingViewAdapter<TSource> previous = this.IInputCollection.SourceAdapter as SortingViewAdapter<TSource>;
+            SortingViewAdapter<TSource> previous = this.PreviousAdapter as SortingViewAdapter<TSource>;
             if (previous != null)
             {
                 previous._isLastInChain = false;

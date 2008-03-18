@@ -7,7 +7,7 @@ namespace ContinuousLinq
 {
     internal interface IViewAdapter
     {
-        IInputCollectionWrapper IInputCollection { get; }
+        IViewAdapter PreviousAdapter { get; }
         void ReEvaluate();
     }
 
@@ -30,7 +30,7 @@ namespace ContinuousLinq
             new Dictionary<Tin, WeakPropertyChangedHandler>();
 
         protected ViewAdapter(InputCollectionWrapper<Tin> input,
-            ReadOnlyContinuousCollection<Tout> output)
+            LinqContinuousCollection<Tout> output)
         {
             if (input == null)
                 throw new ArgumentNullException("input");
@@ -86,9 +86,9 @@ namespace ContinuousLinq
             }
         }
 
-        public IInputCollectionWrapper IInputCollection
+        public IViewAdapter PreviousAdapter
         {
-            get { return _input; }
+            get { return _input.SourceAdapter; }
         }
 
         /// <summary>

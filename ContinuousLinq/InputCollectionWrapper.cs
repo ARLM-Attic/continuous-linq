@@ -4,11 +4,6 @@ using System.Collections.Specialized;
 
 namespace ContinuousLinq
 {
-    internal interface IInputCollectionWrapper
-    {
-        IViewAdapter SourceAdapter { get; }
-    }
-
     /// <summary>
     /// This class provides us with a bit of tricky-work that allows us to create continuous queries
     /// on ObservableCollections and ReadOnlyObservableCollections as well as ContinousCollections. This
@@ -16,15 +11,15 @@ namespace ContinuousLinq
     /// preserving the DRY principal as much as possible.
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    internal class InputCollectionWrapper<T> : IInputCollectionWrapper
+    internal class InputCollectionWrapper<T>
     {
         private readonly IList<T> _inner;
-        private readonly ContinuousCollection<T> _innerAsCC;
+        private readonly LinqContinuousCollection<T> _innerAsCC;
 
         public InputCollectionWrapper(ObservableCollection<T> inner)
         {
             _inner = inner;
-            _innerAsCC = inner as ContinuousCollection<T>;
+            _innerAsCC = inner as LinqContinuousCollection<T>;
         }
 
         public InputCollectionWrapper(ReadOnlyObservableCollection<T> inner)

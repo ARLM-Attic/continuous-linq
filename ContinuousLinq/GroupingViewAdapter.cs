@@ -40,7 +40,7 @@ namespace ContinuousLinq
 
         public GroupingViewAdapter(
             InputCollectionWrapper<TSource> source,
-            ReadOnlyContinuousCollection<GroupedContinuousCollection<TKey, TElement>> output,
+            LinqContinuousCollection<GroupedContinuousCollection<TKey, TElement>> output,
             Func<TSource, TKey> keySelector,
             Func<TSource, TElement> elementSelector,
             IEqualityComparer<TKey> comparer)

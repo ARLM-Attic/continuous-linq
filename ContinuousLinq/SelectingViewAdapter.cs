@@ -17,7 +17,7 @@ namespace ContinuousLinq
         private readonly Func<TSource, TResult> _func;
 
         public SelectingViewAdapter(InputCollectionWrapper<TSource> input,
-            ReadOnlyContinuousCollection<TResult> output,
+            LinqContinuousCollection<TResult> output,
             Func<TSource, TResult> func)
             : base(input, output)
         {

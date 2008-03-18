@@ -18,7 +18,7 @@ namespace ContinuousLinq
         private readonly List<int> _collectionLengths = new List<int>();
 
         public SelectingManyViewAdapter(InputCollectionWrapper<TSource> input,
-            ReadOnlyContinuousCollection<TResult> output,
+            LinqContinuousCollection<TResult> output,
             Func<TSource, IEnumerable<TResult>> func)
             : base(input, output)
         {

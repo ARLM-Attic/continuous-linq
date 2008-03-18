@@ -66,9 +66,6 @@ namespace ContinuousLinq
             _dispatcher = Dispatcher.FromThread(Thread.CurrentThread);
         }
 
-        // todo move this to a subclass? TBD
-        internal IViewAdapter SourceAdapter { get; set; }
-
         public int BinarySearch(T item)
         {
             List<T> list = (List<T>)this.Items;

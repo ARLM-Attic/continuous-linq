@@ -18,7 +18,7 @@ namespace ContinuousLinq
         private readonly Func<T, bool> _predicate;
 
         public FilteringViewAdapter(InputCollectionWrapper<T> input,
-            ReadOnlyContinuousCollection<T> output,
+            LinqContinuousCollection<T> output,
             Func<T, bool> predicateFunc) : base(input, output)
         {
             Trace.WriteLine("[FVA] Init.");

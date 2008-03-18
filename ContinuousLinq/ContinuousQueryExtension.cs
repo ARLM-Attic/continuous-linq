@@ -20,7 +20,7 @@ namespace ContinuousLinq
             InputCollectionWrapper<T> source, Func<T, bool> filterFunc) where T : INotifyPropertyChanged
         {
             Trace.WriteLine("Filtering Observable Collection.");
-            ReadOnlyContinuousCollection<T> output = new ReadOnlyContinuousCollection<T>();
+            LinqContinuousCollection<T> output = new LinqContinuousCollection<T>();
             new FilteringViewAdapter<T>(source, output, filterFunc);
 
             return output;            
@@ -45,7 +45,7 @@ namespace ContinuousLinq
             where TKey : IComparable
         {
             Trace.WriteLine("Ordering Observable Collection (Ascending).");
-            ReadOnlyContinuousCollection<TSource> output = new ReadOnlyContinuousCollection<TSource>();
+            LinqContinuousCollection<TSource> output = new LinqContinuousCollection<TSource>();
             new SortingViewAdapter<TSource>(
                 source, output,
                 new FuncComparer<TSource, TKey>(keySelector, false));
@@ -90,7 +90,7 @@ namespace ContinuousLinq
             where TKey : IComparable
         {
             Trace.WriteLine("Ordering Observable Collection (Descending).");
-            ReadOnlyContinuousCollection<TSource> output = new ReadOnlyContinuousCollection<TSource>();
+            LinqContinuousCollection<TSource> output = new LinqContinuousCollection<TSource>();
             new SortingViewAdapter<TSource>(
                 source, output,
                 new FuncComparer<TSource, TKey>(keySelector, true));
@@ -138,8 +138,8 @@ namespace ContinuousLinq
             where TKey: IComparable
             
         {
-            ReadOnlyContinuousCollection<GroupedContinuousCollection<TKey, TElement>> output =
-                new ReadOnlyContinuousCollection<GroupedContinuousCollection<TKey, TElement>>();
+            LinqContinuousCollection<GroupedContinuousCollection<TKey, TElement>> output =
+                new LinqContinuousCollection<GroupedContinuousCollection<TKey, TElement>>();
 
             new GroupingViewAdapter<TSource, TKey, TElement>(source, output, keySelector, elementSelector, comparer);
             return output;
@@ -238,7 +238,7 @@ namespace ContinuousLinq
             InputCollectionWrapper<TSource> source, Func<TSource, TResult> selector)
             where TSource :  INotifyPropertyChanged
         {
-            ReadOnlyContinuousCollection<TResult> output = new ReadOnlyContinuousCollection<TResult>();
+            LinqContinuousCollection<TResult> output = new LinqContinuousCollection<TResult>();
             new SelectingViewAdapter<TSource, TResult>(source, output, selector);
 
             return output;
@@ -265,7 +265,7 @@ namespace ContinuousLinq
             InputCollectionWrapper<TSource> source, Func<TSource, IEnumerable<TResult>> selector)
             where TSource :  INotifyPropertyChanged
         {
-            ReadOnlyContinuousCollection<TResult> output = new ReadOnlyContinuousCollection<TResult>();
+            LinqContinuousCollection<TResult> output = new LinqContinuousCollection<TResult>();
             new SelectingManyViewAdapter<TSource, TResult>(source, output, selector);
 
             return output;
@@ -295,12 +295,15 @@ namespace ContinuousLinq
         /// <param name="source"></param>
         public static void ReEvaluate<TSource>(this ContinuousCollection<TSource> source)
         {
+            LinqContinuousCollection<TSource> collection = source as LinqContinuousCollection<TSource>;
+            if (collection == null)
+                return;
             List<IViewAdapter> adapterCollection = new List<IViewAdapter>();
-            IViewAdapter adapter = source.SourceAdapter;
+            IViewAdapter adapter = collection.SourceAdapter;
             while (adapter != null)
             {
                 adapterCollection.Add(adapter);
-                adapter = adapter.IInputCollection.SourceAdapter;
+                adapter = adapter.PreviousAdapter;
             }
             adapterCollection.Reverse();
             adapterCollection.ForEach(a => a.ReEvaluate());

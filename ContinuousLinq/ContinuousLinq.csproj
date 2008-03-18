@@ -55,6 +55,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ContinuousQueryExtension.cs" />
+    <Compile Include="LinqContinuousCollection.cs" />
     <Compile Include="OutputCollectionWrapper.cs" />
     <Compile Include="ReadOnlyContinuousCollection.cs" />
     <Compile Include="SelectingManyViewAdapter.cs" />
