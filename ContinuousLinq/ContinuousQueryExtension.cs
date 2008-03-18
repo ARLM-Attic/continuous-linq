@@ -293,7 +293,7 @@ namespace ContinuousLinq
         /// </summary>
         /// <typeparam name="TSource"></typeparam>
         /// <param name="source"></param>
-        public static void ReEvaluate<TSource>(this ContinuousCollection<TSource> source)
+        public static void ReEvaluate<TSource>(this ReadOnlyContinuousCollection<TSource> source)
         {
             LinqContinuousCollection<TSource> collection = source as LinqContinuousCollection<TSource>;
             if (collection == null)
