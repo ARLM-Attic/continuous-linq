@@ -284,5 +284,28 @@ namespace ContinuousLinq
             return SelectMany(new InputCollectionWrapper<TSource>(source), selector);
         }
         #endregion
+
+        #region Helpers
+
+        /// <summary>
+        /// When a change occurs, which is not a property change on a collection item,
+        /// but changes the result of a Where() filter
+        /// </summary>
+        /// <typeparam name="TSource"></typeparam>
+        /// <param name="source"></param>
+        public static void ReEvaluate<TSource>(this ContinuousCollection<TSource> source)
+        {
+            List<IViewAdapter> adapterCollection = new List<IViewAdapter>();
+            IViewAdapter adapter = source.SourceAdapter;
+            while (adapter != null)
+            {
+                adapterCollection.Add(adapter);
+                adapter = adapter.IInputCollection.SourceAdapter;
+            }
+            adapterCollection.Reverse();
+            adapterCollection.ForEach(a => a.ReEvaluate());
+        }
+
+        #endregion
     }
 }

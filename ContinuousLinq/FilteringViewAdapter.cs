@@ -12,7 +12,8 @@ namespace ContinuousLinq
     /// only those items that pass the filter predicate (included in the LINQ query in the where clause)
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    internal sealed class FilteringViewAdapter<T> : ViewAdapter<T, T> where T : INotifyPropertyChanged
+    internal sealed class FilteringViewAdapter<T> : ViewAdapter<T, T>
+        where T : INotifyPropertyChanged
     {
         private readonly Func<T, bool> _predicate;
 
@@ -26,7 +27,9 @@ namespace ContinuousLinq
             foreach (T item in this.InputCollection)
             {
                 if (_predicate(item))
+                {
                     this.OutputCollection.Add(item);
+                }
             }
         }
 
@@ -39,11 +42,16 @@ namespace ContinuousLinq
         protected override void OnCollectionItemPropertyChanged(T item, string propertyName)
         {
             Trace.WriteLine("[FVA] (" + item + ") Property Changed : " + propertyName);
+            Filter(item);
+        }
+
+        private void Filter(T item)
+        {
             if (_predicate != null)
             {
                 if (!_predicate(item))
                 {
-                    this.OutputCollection.Remove(item);                    
+                    this.OutputCollection.Remove(item);
                 }
                 else if (!this.OutputCollection.Contains(item))
                 {
@@ -51,7 +59,15 @@ namespace ContinuousLinq
                 }
             }
         }
-      
+
+        public override void ReEvaluate()
+        {
+            foreach (T item in this.InputCollection)
+            {
+                Filter(item);
+            }
+        }
+
         /// <summary>
         /// When an item is added to the inbound collection, set up a weak monitoring event
         /// handler to listen to changes to that item so that any change to the new item
@@ -62,7 +78,6 @@ namespace ContinuousLinq
         /// <param name="index"></param>
         protected override void AddItem(T newItem, int index)
         {
-            SubscribeToItem(newItem);
             if (_predicate == null || _predicate(newItem))
             {
                 this.OutputCollection.Add(newItem);
@@ -79,9 +94,13 @@ namespace ContinuousLinq
         /// <returns></returns>
         protected override bool RemoveItem(T existingItem, int index)
         {
-            UnsubscribeFromItem(existingItem);
             bool hadIt = this.OutputCollection.Remove(existingItem);
             return hadIt;
+        }
+
+        protected override void Clear()
+        {
+            this.OutputCollection.Clear();
         }
     }
 }

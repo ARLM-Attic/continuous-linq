@@ -66,6 +66,15 @@ namespace ContinuousLinq
             this.OutputCollection.ReplaceRange(outIndex, newList);
         }
 
+        public override void ReEvaluate()
+        {
+            IList<TSource> innerAsList = this.InputCollection;
+            for (int i = 0, n = innerAsList.Count; i < n; i++)
+            {
+                ReplacedOrChanged(innerAsList[i], i);
+            }
+        }
+
         protected override void OnCollectionItemPropertyChanged(TSource item, string propertyName)
         {
             int index = this.InputCollection.IndexOf(item);
@@ -76,6 +85,8 @@ namespace ContinuousLinq
         {
             if (e.Action == NotifyCollectionChangedAction.Replace)
             {
+                UnsubscribeFromItem((TSource)e.OldItems[0]);
+                SubscribeToItem((TSource)e.NewItems[0]);
                 int index = e.OldStartingIndex;
                 ReplacedOrChanged((TSource)e.OldItems[0], index);
             }
@@ -87,7 +98,6 @@ namespace ContinuousLinq
 
         protected override bool RemoveItem(TSource deleteItem, int inIndex)
         {
-            UnsubscribeFromItem(deleteItem);
             int outIndex = CountUntilIndex(inIndex);
             int count = _collectionLengths[inIndex];
             this.OutputCollection.RemoveRange(outIndex, count);
@@ -97,11 +107,16 @@ namespace ContinuousLinq
 
         protected override void AddItem(TSource newItem, int inIndex)
         {
-            SubscribeToItem(newItem);
             int outIndex = CountUntilIndex(inIndex);
             List<TResult> outList = new List<TResult>(_func(newItem));
             this.OutputCollection.InsertRange(outIndex, outList);
             _collectionLengths.Insert(inIndex, outList.Count);
+        }
+
+        protected override void Clear()
+        {
+            this.OutputCollection.Clear();
+            _collectionLengths.Clear();
         }
     }
 }

@@ -67,7 +67,7 @@ namespace ContinuousLinq
         }
 
         // todo move this to a subclass? TBD
-        internal object /*IViewAdapter*/ SourceAdapter { get; set; }
+        internal IViewAdapter SourceAdapter { get; set; }
 
         public int BinarySearch(T item)
         {

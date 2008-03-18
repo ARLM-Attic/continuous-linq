@@ -5,6 +5,12 @@ using System.Collections.Specialized;
 
 namespace ContinuousLinq
 {
+    internal interface IViewAdapter
+    {
+        IInputCollectionWrapper IInputCollection { get; }
+        void ReEvaluate();
+    }
+
     /// We want to arrange things so that when the output collection of
     /// a CLINQ chain gets dropped, all the intermediate adapters and
     /// collections also get dropped.  So we use weak event listeners.
@@ -13,7 +19,7 @@ namespace ContinuousLinq
     /// adapter (which already has a hard link to its input collection).
     /// This hard link is the collection's SourceAdapter, which is also
     /// used for other purposes.
-    internal abstract class ViewAdapter<Tin, Tout>
+    internal abstract class ViewAdapter<Tin, Tout> : IViewAdapter
         where Tin : INotifyPropertyChanged
     {
         private readonly InputCollectionWrapper<Tin> _input;
@@ -48,17 +54,8 @@ namespace ContinuousLinq
 
             foreach (Tin item in this.InputCollection)
             {
-                SubscribeToItemNoCheck(item);
+                SubscribeToItem(item);
             }
-        }
-
-        /// <summary>
-        /// Blindly subscribes to change events fired by the input item using a weak event handler
-        /// </summary>
-        /// <param name="item"></param>
-        private void SubscribeToItemNoCheck(Tin item)
-        {
-            _handlerMap[item] = new WeakPropertyChangedHandler(item, _propertyChangedDelegate);
         }
 
         /// <summary>
@@ -70,7 +67,7 @@ namespace ContinuousLinq
         {
             if (_handlerMap.ContainsKey(item) == false)
             {
-                SubscribeToItemNoCheck(item);
+                _handlerMap[item] = new WeakPropertyChangedHandler(item, _propertyChangedDelegate);
             }
         }
 
@@ -87,6 +84,11 @@ namespace ContinuousLinq
                 handler.Detach();
                 _handlerMap.Remove(item);
             }
+        }
+
+        public IInputCollectionWrapper IInputCollection
+        {
+            get { return _input; }
         }
 
         /// <summary>
@@ -129,30 +131,54 @@ namespace ContinuousLinq
         /// <returns></returns>
         protected abstract bool RemoveItem(Tin newItem, int index);
 
+        protected abstract void Clear();
+
         /// <summary>
         /// Base actions to take place when the collection being monitored notifies the adapter
         /// of a change. This method calls AddItem and RemoveItem, which are defined by the derived
         /// types for cleanliness.
         /// </summary>
         /// <param name="e"></param>
-        protected virtual void OnInputCollectionChanged(NotifyCollectionChangedEventArgs e) {
-            if (e.Action == NotifyCollectionChangedAction.Remove)
+        protected virtual void OnInputCollectionChanged(NotifyCollectionChangedEventArgs e)
+        {
+            switch (e.Action)
             {
-                RemoveItem((Tin)e.OldItems[0], e.OldStartingIndex);
-            }
-            else if (e.Action == NotifyCollectionChangedAction.Add)
-            {
-                AddItem((Tin)e.NewItems[0], e.NewStartingIndex);
-            }
-            else if (e.Action == NotifyCollectionChangedAction.Replace)
-            {
-                if (RemoveItem((Tin)e.OldItems[0], e.OldStartingIndex))
-                {
-                    AddItem((Tin)e.NewItems[0], e.NewStartingIndex);
-                }
+                case NotifyCollectionChangedAction.Remove:
+                    Tin toDelete = (Tin)e.OldItems[0];
+                    UnsubscribeFromItem(toDelete);
+                    RemoveItem(toDelete, e.OldStartingIndex);
+                    break;
+                case NotifyCollectionChangedAction.Add:
+                    Tin toAdd = (Tin)e.NewItems[0];
+                    SubscribeToItem(toAdd);
+                    AddItem(toAdd, e.NewStartingIndex);
+                    break;
+                case NotifyCollectionChangedAction.Replace:
+                case NotifyCollectionChangedAction.Move:
+                    Tin oldItem = (Tin)e.OldItems[0];
+                    UnsubscribeFromItem(oldItem);
+                    if (RemoveItem(oldItem, e.OldStartingIndex))
+                    {
+                        Tin newItem = (Tin)e.NewItems[0];
+                        SubscribeToItem(newItem);
+                        AddItem(newItem, e.NewStartingIndex);
+                    }
+                    break;
+                case NotifyCollectionChangedAction.Reset:
+                    foreach (Tin item in _input.InnerAsList)
+                    {
+                        UnsubscribeFromItem(item);
+                    }
+                    Clear();
+                    break;
             }
         }
 
-        
+        /// <summary>
+        /// Any adapters with lambda expressions need to refilter now.
+        /// Force subclasses to implement so we don't forget any.
+        /// Public because of the interface.
+        /// </summary>
+        public abstract void ReEvaluate();
     }
 }

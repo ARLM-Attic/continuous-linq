@@ -43,6 +43,8 @@ namespace ContinuousLinq
         {
             if (e.Action == NotifyCollectionChangedAction.Replace)
             {
+                UnsubscribeFromItem((TSource)e.OldItems[0]);
+                SubscribeToItem((TSource)e.NewItems[0]);
                 int index = e.OldStartingIndex;
                 this.OutputCollection[index] = _func((TSource)e.NewItems[0]);
             }
@@ -54,24 +56,28 @@ namespace ContinuousLinq
 
         protected override bool RemoveItem(TSource deleteItem, int index)
         {
-            UnsubscribeFromItem(deleteItem);
             this.OutputCollection.RemoveAt(index);
             return true;
         }
 
         protected override void AddItem(TSource newItem, int index)
         {
-            SubscribeToItem(newItem);
             this.OutputCollection.Insert(index, _func(newItem));
         }
 
-        /*public override void ReEvaluate()
+        protected override void Clear()
         {
-            IList<TSource> innerAsList = _input.InnerAsList;
+            this.OutputCollection.Clear();
+        }
+
+        public override void ReEvaluate()
+        {
+            var innerAsList = this.InputCollection;
+            var outputCollection = this.OutputCollection;
             for (int i = 0, n = innerAsList.Count; i < n; i++)
             {
-                _output[i] = _func(innerAsList[i]);
+                outputCollection[i] = _func(innerAsList[i]);
             }
-        }*/
+        }
     }
 }

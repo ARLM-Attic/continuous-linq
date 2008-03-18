@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Windows.Threading;
 
 namespace ContinuousLinq
 {
@@ -20,10 +19,24 @@ namespace ContinuousLinq
             where TKey : IComparable
             
     {
+        private class GroupAndElement
+        {
+            public GroupedContinuousCollection<TKey, TElement> Group { get; private set; }
+            public TElement Element { get; private set; }
+
+            public GroupAndElement(GroupedContinuousCollection<TKey, TElement> group, TElement element)
+            {
+                this.Group = group;
+                this.Element = element;
+            }
+        }
+
         private readonly Func<TSource, TKey> _keySelector;
         private readonly Func<TSource, TElement> _elementSelector;
         private readonly IEqualityComparer<TKey> _comparer;
         private readonly Dictionary<TKey, GroupedContinuousCollection<TKey, TElement>> _groupMap = new Dictionary<TKey, GroupedContinuousCollection<TKey, TElement>>();
+        // Maps an input item to its current output group.
+        private readonly Dictionary<TSource, GroupAndElement> _outputShadowMap = new Dictionary<TSource, GroupAndElement>();
 
         public GroupingViewAdapter(
             InputCollectionWrapper<TSource> source,
@@ -45,93 +58,105 @@ namespace ContinuousLinq
 
             foreach (TSource item in this.InputCollection)
             {
-                AddItem(item);
+                AddItem(item, -1);
             }
         }
 
-        private void AddItem(TSource item)
+        private void AddItem(TSource item, TElement element)
         {
             TKey theKey = _keySelector(item);
             GroupedContinuousCollection<TKey, TElement> outputGroup;
             if (_groupMap.TryGetValue(theKey, out outputGroup) == false)
             {
-                // item belongs in a new group
                 outputGroup = new GroupedContinuousCollection<TKey, TElement>(theKey, _comparer);
-                // Maybe later use output's dispatch priority?
                 this.OutputCollection.Add(outputGroup);
                 _groupMap[theKey] = outputGroup;
             }
             try
             {
                 outputGroup.IsSealed = false;
-                outputGroup.Add(_elementSelector(item));
+                outputGroup.Add(element);
             }
             finally
             {
-                outputGroup.IsSealed = true;                
+                outputGroup.IsSealed = true;
             }
+            _outputShadowMap[item] = new GroupAndElement(outputGroup, element);
         }
 
-        protected override void AddItem(TSource item, int index)
+        private bool RemoveItem(TSource item)
         {
-            SubscribeToItem(item);
-            AddItem(item);
-        }
-
-        private bool RemoveFrom(TElement element, GroupedContinuousCollection<TKey, TElement> group)
-        {
-            bool ret;
-            try
+            GroupAndElement info;
+            if (_outputShadowMap.TryGetValue(item, out info))
             {
-                group.IsSealed = false;
-                ret = group.Remove(element);
-            }
-            finally
-            {
-                group.IsSealed = true;
-            }
-            if (group.Count == 0)
-            {
-                this.OutputCollection.Remove(group);
-                _groupMap.Remove(group.Key);
-            }
-            return ret;
-        }
-
-        protected override bool RemoveItem(TSource item, int index)
-        {
-            UnsubscribeFromItem(item);
-            bool hadIt = false;
-            // Remove the item from the appropriate group.
-            // Do it the hard way in case a property change was missed.
-            TElement element = _elementSelector(item);
-            foreach (GroupedContinuousCollection<TKey, TElement> scanGroup in this.OutputCollection)
-            {
-                if (RemoveFrom(element, scanGroup))
+                _outputShadowMap.Remove(item);
+                GroupedContinuousCollection<TKey, TElement> group = info.Group;
+                bool wasRemoved;
+                try
                 {
-                    hadIt = true;
-                    break;
+                    group.IsSealed = false;
+                    wasRemoved = group.Remove(info.Element);
                 }
+                finally
+                {
+                    group.IsSealed = true;
+                }
+                if (group.Count == 0)
+                {
+                    this.OutputCollection.Remove(group);
+                    _groupMap.Remove(group.Key);
+                }
+                return wasRemoved;
             }
-            return hadIt;
+            else
+                return false;
+        }
+
+        protected override void AddItem(TSource item, int dummy)
+        {
+            AddItem(item, _elementSelector(item));
+        }
+
+        protected override bool RemoveItem(TSource item, int dummy)
+        {
+            return RemoveItem(item);
+        }
+
+        protected override void Clear()
+        {
+            this.OutputCollection.Clear();
+            _groupMap.Clear();
+            _outputShadowMap.Clear();
         }
 
         protected override void OnCollectionItemPropertyChanged(TSource item, string propertyName)
         {
-            //  Trace.WriteLine("[GVA] Property Changed.");
-            TKey theKey = _keySelector(item);
-            TElement element = _elementSelector(item);
-            foreach (GroupedContinuousCollection<TKey, TElement> oldGroup in this.OutputCollection)
+            GroupAndElement info;
+            if (_outputShadowMap.TryGetValue(item, out info))
             {
-                if (oldGroup.Contains(element))
-                {
-                    if (oldGroup.Key.Equals(theKey) == false)
-                    {
-                        RemoveFrom(element, oldGroup);
-                        AddItem(item);
-                    }
-                    break;
-                }
+                MaybeMoveItem(item, info);
+            }
+            return ret;
+        }
+
+        private void MaybeMoveItem(TSource item, GroupAndElement info)
+        {
+            TKey newKey = _keySelector(item);
+            TElement newElement = _elementSelector(item);
+            if (info.Group.Key.Equals(newKey) == false || info.Element.Equals(newElement) == false)
+            {
+                RemoveItem(item);
+                AddItem(item, newElement);
+            }
+        }
+
+        public override void ReEvaluate()
+        {
+            foreach (KeyValuePair<TSource, GroupAndElement> pair in _outputShadowMap)
+            {
+                TSource item = pair.Key;
+                GroupAndElement info = pair.Value;
+                MaybeMoveItem(item, info);
             }
         }
     }
