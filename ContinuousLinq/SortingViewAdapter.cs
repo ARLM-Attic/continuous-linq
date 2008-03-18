@@ -30,7 +30,7 @@ namespace ContinuousLinq
             FullSort(); // Because we do not know yet if we are last in chain.
         }
 
-        private void SetComparerChain(IComparer<TSource> compareFunc, SortingViewAdapter<TSource> previous)
+        private void SetComparerChain(IComparer<TSource> compareFunc)
         {
             SortingViewAdapter<TSource> previous = this.IInputCollection.SourceAdapter as SortingViewAdapter<TSource>;
             if (previous != null)

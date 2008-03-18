@@ -136,7 +136,6 @@ namespace ContinuousLinq
             {
                 MaybeMoveItem(item, info);
             }
-            return ret;
         }
 
         private void MaybeMoveItem(TSource item, GroupAndElement info)
