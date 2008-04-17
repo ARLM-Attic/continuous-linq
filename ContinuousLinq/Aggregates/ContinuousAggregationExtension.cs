@@ -1,4 +1,9 @@
-﻿using System;
+﻿/*
+ * Continuous Aggregation Extensions
+ * Created by: Kevin Hoffman
+ * Created on: April 16, 2008
+ */
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,6 +16,7 @@ namespace ContinuousLinq.Aggregates
 {
     public static class ContinuousAggregationExtension
     {
+        #region SUM
         /// <summary>
         /// Invoke as 
         /// ContinuousValue<int> cAge = myQuery.ContinuousSum<int>( c => c.Age );
@@ -82,6 +88,7 @@ namespace ContinuousLinq.Aggregates
 
             return output;
         }
+        #endregion
 
         #region MIN
         public static ContinuousValue<int> ContinuousMin<T>(
@@ -237,6 +244,60 @@ namespace ContinuousLinq.Aggregates
                 new ContinuousMaxMonitorDecimal<T>(input, output, maxFunc);
             return output;
         }
+        #endregion
+
+        #region STDDEV
+        public static ContinuousValue<double> ContinuousStdDev<T>(
+            this ObservableCollection<T> input,
+            Func<T, int> columnSelector) where T : INotifyPropertyChanged
+        {
+            ContinuousValue<double> output = new ContinuousValue<double>();
+            ContinuousStdDevMonitorInt<T> stdDevMonitor =
+                new ContinuousStdDevMonitorInt<T>(input, output, columnSelector);
+
+            return output;
+        }
+
+        public static ContinuousValue<double> ContinuousStdDev<T>(
+            this ObservableCollection<T> input,
+            Func<T, decimal> columnSelector) where T : INotifyPropertyChanged
+        {
+            ContinuousValue<double> output = new ContinuousValue<double>();
+            ContinuousStdDevMonitorDecimal<T> stdDevMonitor =
+                new ContinuousStdDevMonitorDecimal<T>(input, output, columnSelector);
+            return output;
+        }
+
+        public static ContinuousValue<double> ContinuousStdDev<T>(
+            this ObservableCollection<T> input,
+            Func<T, float> columnSelector) where T : INotifyPropertyChanged
+        {
+            ContinuousValue<double> output = new ContinuousValue<double>();
+            ContinuousStdDevMonitorFloat<T> stdDevMonitor =
+                new ContinuousStdDevMonitorFloat<T>(input, output, columnSelector);
+            return output;
+        }
+
+        public static ContinuousValue<double> ContinuousStdDev<T>(
+            this ObservableCollection<T> input,
+            Func<T, double> columnSelector) where T : INotifyPropertyChanged
+        {
+            ContinuousValue<double> output = new ContinuousValue<double>();
+            ContinuousStdDevMonitorDouble<T> stdDevMonitor =
+                new ContinuousStdDevMonitorDouble<T>(input, output, columnSelector);
+            return output;
+        }
+
+        public static ContinuousValue<double> ContinuousStdDev<T>(
+            this ObservableCollection<T> input,
+            Func<T, long> columnSelector) where T : INotifyPropertyChanged
+        {
+            ContinuousValue<double> output = new ContinuousValue<double>();
+            ContinuousStdDevMonitorLong<T> stdDevMonitor =
+                new ContinuousStdDevMonitorLong<T>(input, output, columnSelector);
+            return output;
+        }
+
         #endregion
     }
 }

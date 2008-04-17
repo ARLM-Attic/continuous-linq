@@ -62,6 +62,8 @@
     <Compile Include="Aggregates\ContinuousMinMonitor.cs" />
     <Compile Include="Aggregates\ContinuousSumMonitor.cs" />
     <Compile Include="Aggregates\ContinuousValue.cs" />
+    <Compile Include="Aggregates\StdDev.cs" />
+    <Compile Include="Aggregates\ContinuousStdDevMonitor.cs" />
     <Compile Include="ContinuousQueryExtension.cs" />
     <Compile Include="LinqContinuousCollection.cs" />
     <Compile Include="OutputCollectionWrapper.cs" />
