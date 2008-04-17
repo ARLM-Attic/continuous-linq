@@ -1,28 +1,44 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Collections.ObjectModel;
 
 namespace ContinuousLinq.Aggregates
 {
-    public static class StdDev
+    internal static class StdDev
     {
-        public static double Compute<T>(Func<T, int> columnSelector, ObservableCollection<T> dataList)
+        public static double Compute<T>(Func<T, int> columnSelector, ICollection<T> dataList)
         {
             double finalValue = 0;
-            double average = 0.0;
             double variance = 0.0;
-            int count = 0;
 
-            count = dataList.Count;
-            average = dataList.Average(columnSelector);
+            int count = dataList.Count;
+            double average = dataList.Average(columnSelector);
 
             if (count == 0) return finalValue;
 
-            for (int x = 0; x < count; x++)
+            foreach(T item in dataList)
             {
-                int columnValue = columnSelector(dataList[x]);
+                int columnValue = columnSelector(item);
+                variance += Math.Pow(columnValue - average, 2);
+            }
+
+            finalValue = Math.Sqrt(variance/count);
+            return finalValue;
+        }
+
+        public static double Compute<T>(Func<T, double> columnSelector, ICollection<T> dataList)
+        {
+            double finalValue = 0;
+            double variance = 0.0;
+
+            int count = dataList.Count;
+            double average = dataList.Average(columnSelector);
+
+            if (count == 0) return finalValue;
+
+            foreach (T item in dataList)
+            {
+                double columnValue = columnSelector(item);
                 variance += Math.Pow(columnValue - average, 2);
             }
 
@@ -30,21 +46,19 @@ namespace ContinuousLinq.Aggregates
             return finalValue;
         }
 
-        public static double Compute<T>(Func<T, double> columnSelector, ObservableCollection<T> dataList)
+        public static double Compute<T>(Func<T, float> columnSelector, ICollection<T> dataList)
         {
             double finalValue = 0;
-            double average = 0.0;
             double variance = 0.0;
-            int count = 0;
 
-            count = dataList.Count;
-            average = dataList.Average(columnSelector);
+            int count = dataList.Count;
+            double average = dataList.Average(columnSelector);
 
             if (count == 0) return finalValue;
 
-            for (int x = 0; x < count; x++)
+            foreach (T item in dataList)
             {
-                double columnValue = columnSelector(dataList[x]);
+                float columnValue = columnSelector(item);
                 variance += Math.Pow(columnValue - average, 2);
             }
 
@@ -52,21 +66,19 @@ namespace ContinuousLinq.Aggregates
             return finalValue;
         }
 
-        public static double Compute<T>(Func<T, float> columnSelector, ObservableCollection<T> dataList)
+        public static double Compute<T>(Func<T, long> columnSelector, ICollection<T> dataList)
         {
             double finalValue = 0;
-            double average = 0.0;
             double variance = 0.0;
-            int count = 0;
 
-            count = dataList.Count;
-            average = dataList.Average(columnSelector);
+            int count = dataList.Count;
+            double average = dataList.Average(columnSelector);
 
             if (count == 0) return finalValue;
 
-            for (int x = 0; x < count; x++)
+            foreach (T item in dataList)
             {
-                float columnValue = columnSelector(dataList[x]);
+                long columnValue = columnSelector(item);
                 variance += Math.Pow(columnValue - average, 2);
             }
 
@@ -74,49 +86,24 @@ namespace ContinuousLinq.Aggregates
             return finalValue;
         }
 
-        public static double Compute<T>(Func<T, long> columnSelector, ObservableCollection<T> dataList)
+        public static double Compute<T>(Func<T, decimal> columnSelector, ICollection<T> dataList)
         {
             double finalValue = 0;
-            double average = 0.0;
             double variance = 0.0;
-            int count = 0;
 
-            count = dataList.Count;
-            average = dataList.Average(columnSelector);
+            int count = dataList.Count;
+            double average = (double) dataList.Average(columnSelector);
 
             if (count == 0) return finalValue;
 
-            for (int x = 0; x < count; x++)
+            foreach (T item in dataList)
             {
-                long columnValue = columnSelector(dataList[x]);
+                double columnValue = (double)columnSelector(item);
                 variance += Math.Pow(columnValue - average, 2);
             }
 
-            finalValue = Math.Sqrt(variance / count);
+            finalValue = Math.Sqrt(variance/count);
             return finalValue;
         }
-
-        public static double Compute<T>(Func<T, decimal> columnSelector, ObservableCollection<T> dataList)
-        {
-            double finalValue = 0;
-            double average = 0.0;
-            double variance = 0.0;
-            int count = 0;
-
-            count = dataList.Count;
-            average = (double)dataList.Average(columnSelector);
-
-            if (count == 0) return finalValue;
-
-            for (int x = 0; x < count; x++)
-            {
-                double columnValue = (double)columnSelector(dataList[x]);
-                variance += Math.Pow(columnValue - average, 2);
-            }
-
-            finalValue = Math.Sqrt(variance / count);
-            return finalValue;
-        }
-        
     }
 }

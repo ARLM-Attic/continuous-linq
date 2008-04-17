@@ -1,51 +1,56 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.ComponentModel;
-using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 
 namespace ContinuousLinq.Aggregates
 {
-    public class AggregateViewAdapter<T> where T : INotifyPropertyChanged
+    internal abstract class AggregateViewAdapter<INPUT, OUTPUT> : AggregateViewAdapter<INPUT, OUTPUT, OUTPUT>
+        where INPUT : INotifyPropertyChanged
     {
-        protected ObservableCollection<T> _input;
+        protected AggregateViewAdapter(InputCollectionWrapper<INPUT> input, ContinuousValue<OUTPUT> output,
+                                       Func<INPUT, OUTPUT> aggFunc) : base(input, output, aggFunc)
+        {
+        }
+    }
+
+    internal abstract class AggregateViewAdapter<INPUT, FUNCOUT, OUTPUT> where INPUT : INotifyPropertyChanged
+    {
+        private readonly InputCollectionWrapper<INPUT> _input;
+        private readonly ContinuousValue<OUTPUT> _output;
+        private readonly Func<INPUT, FUNCOUT> _aggFunc;
         private readonly NotifyCollectionChangedEventHandler _collectionChangedDelegate;
         private readonly PropertyChangedEventHandler _propertyChangedDelegate;
-        private readonly Dictionary<T, WeakPropertyChangedHandler> _handlerMap =
-            new Dictionary<T, WeakPropertyChangedHandler>();
+        private readonly Dictionary<INPUT, WeakPropertyChangedHandler> _handlerMap =
+            new Dictionary<INPUT, WeakPropertyChangedHandler>();
 
-        public AggregateViewAdapter(ObservableCollection<T> input)
+        protected AggregateViewAdapter(InputCollectionWrapper<INPUT> input, ContinuousValue<OUTPUT> output, Func<INPUT,FUNCOUT> aggFunc)
         {
             _input = input;
+            _output = output;
+            _aggFunc = aggFunc;
 
-            _collectionChangedDelegate = delegate(object sender, NotifyCollectionChangedEventArgs args)
+            _collectionChangedDelegate = ((sender, args) => OnInputCollectionChanged(args));
+            _propertyChangedDelegate = ((sender, e) => ReAggregate());
+
+            new WeakCollectionChangedHandler(input.InnerAsNotifier, _collectionChangedDelegate);
+
+            foreach (INPUT item in this.InputCollection)
             {
-                OnInputCollectionChanged(args);
-            };
-            _propertyChangedDelegate = delegate(object sender, PropertyChangedEventArgs args)
-            {
-                OnCollectionItemPropertyChanged((T)sender, args.PropertyName);
-            };
+                SubscribeToItem(item);
+            }
+            ReAggregate(); 
+        }
 
-            new WeakCollectionChangedHandler(_input, _collectionChangedDelegate);
-
-            foreach (T item in input)
-            {
-                SubscribeToItemNoCheck(item);
-            }             
-        }        
-
-        protected void SubscribeToItem(T item)
+        protected void SubscribeToItem(INPUT item)
         {
             if (_handlerMap.ContainsKey(item) == false)
             {
-                SubscribeToItemNoCheck(item);
+                _handlerMap[item] = new WeakPropertyChangedHandler(item, _propertyChangedDelegate);
             }
         }
 
-        protected void UnsubscribeFromItem(T item)
+        protected void UnsubscribeFromItem(INPUT item)
         {
             WeakPropertyChangedHandler handler;
             if (_handlerMap.TryGetValue(item, out handler))
@@ -55,35 +60,49 @@ namespace ContinuousLinq.Aggregates
             }
         }
 
-        private void SubscribeToItemNoCheck(T item)
+        /// <summary>
+        /// A pointer to the collection to which this adapter is listening
+        /// </summary>
+        protected IList<INPUT> InputCollection
         {
-            _handlerMap[item] = 
-                new WeakPropertyChangedHandler((INotifyPropertyChanged)item, _propertyChangedDelegate);
+            get { return _input.InnerAsList; }
+        }
+
+        protected ContinuousValue<OUTPUT> Output
+        {
+            get { return _output; }
+        }
+
+        protected Func<INPUT, FUNCOUT> AggFunc
+        {
+            get { return _aggFunc; }
         }
 
         void OnInputCollectionChanged(NotifyCollectionChangedEventArgs e)
         {
-            if (e.Action == NotifyCollectionChangedAction.Remove)
+            switch (e.Action)
             {
-                UnsubscribeFromItem((T)e.OldItems[0]);
-            }
-            else if (e.Action == NotifyCollectionChangedAction.Add)
-            {
-                SubscribeToItem((T)e.NewItems[0]);
-            }
-            else if (e.Action == NotifyCollectionChangedAction.Replace)
-            {
-                UnsubscribeFromItem((T)e.OldItems[0]);
-                SubscribeToItem((T)e.NewItems[0]);                
+                case NotifyCollectionChangedAction.Remove:
+                    UnsubscribeFromItem((INPUT) e.OldItems[0]);
+                    break;
+                case NotifyCollectionChangedAction.Add:
+                    SubscribeToItem((INPUT) e.NewItems[0]);
+                    break;
+                case NotifyCollectionChangedAction.Replace:
+                case NotifyCollectionChangedAction.Move:
+                    UnsubscribeFromItem((INPUT) e.OldItems[0]);
+                    SubscribeToItem((INPUT) e.NewItems[0]);
+                    break;
+                case NotifyCollectionChangedAction.Reset:
+                    foreach (INPUT item in _input.InnerAsList)
+                    {
+                        UnsubscribeFromItem(item);
+                    }
+                    break;
             }
             ReAggregate();
         }
 
-        void OnCollectionItemPropertyChanged(T item, string propertyName)
-        {
-            ReAggregate();
-        }
-
-        protected virtual void ReAggregate() { }
+        protected abstract void ReAggregate();
     }
 }

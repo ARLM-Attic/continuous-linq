@@ -5,111 +5,81 @@
  * Created on: 04/16/2008
  */
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Linq;
 
 namespace ContinuousLinq.Aggregates
 {
-    public class ContinuousAverageMonitorDecimal<T> : AggregateViewAdapter<T> where T:INotifyPropertyChanged
+    internal class ContinuousAverageMonitorDecimal<T> : AggregateViewAdapter<T, decimal> where T:INotifyPropertyChanged
     {        
-        protected ContinuousValue<decimal> _output;
-        protected Func<T, decimal> _averageFunc;
-
-        public ContinuousAverageMonitorDecimal(ObservableCollection<T> input,
+        public ContinuousAverageMonitorDecimal(InputCollectionWrapper<T> input,
             ContinuousValue<decimal> output,
-            Func<T, decimal> averageFunc) : base(input)
+            Func<T, decimal> averageFunc) : base(input, output, averageFunc)
         {            
-            _output = output;
-            _averageFunc = averageFunc;         
         }
 
         protected override void ReAggregate()
         {
-            _output.CurrentValue = _input.Average(_averageFunc);
+            this.Output.CurrentValue = this.InputCollection.Average(this.AggFunc);
         }
     }
 
-    public class ContinuousAverageMonitorDouble<T> : AggregateViewAdapter<T> where T : INotifyPropertyChanged
+    internal class ContinuousAverageMonitorDouble<T> : AggregateViewAdapter<T, double> where T:INotifyPropertyChanged
     {
-        protected ContinuousValue<double> _output;
-        protected Func<T, double> _averageFunc;
-
-        public ContinuousAverageMonitorDouble(ObservableCollection<T> input,
+        public ContinuousAverageMonitorDouble(InputCollectionWrapper<T> input,
             ContinuousValue<double> output,
-            Func<T, double> averageFunc)
-            : base(input)
-        {
-            _output = output;
-            _averageFunc = averageFunc;
+            Func<T, double> averageFunc) : base(input, output, averageFunc)
+        {            
         }
 
         protected override void ReAggregate()
         {
-            _output.CurrentValue = _input.Average(_averageFunc);
+            this.Output.CurrentValue = this.InputCollection.Average(this.AggFunc);
         }
     }
 
-    public class ContinuousAverageMonitorFloat<T> : AggregateViewAdapter<T> where T : INotifyPropertyChanged
+    internal class ContinuousAverageMonitorFloat<T> : AggregateViewAdapter<T, float> where T : INotifyPropertyChanged
     {
-        protected ContinuousValue<float> _output;
-        protected Func<T, float> _averageFunc;
-
-        public ContinuousAverageMonitorFloat(ObservableCollection<T> input,
+        public ContinuousAverageMonitorFloat(InputCollectionWrapper<T> input,
             ContinuousValue<float> output,
             Func<T, float> averageFunc)
-            : base(input)
+            : base(input, output, averageFunc)
         {
-            _output = output;
-            _averageFunc = averageFunc;
         }
 
         protected override void ReAggregate()
         {
-            _output.CurrentValue = _input.Average(_averageFunc);
+            this.Output.CurrentValue = this.InputCollection.Average(this.AggFunc);
         }
     }
 
-    public class ContinuousAverageMonitorDoubleInt<T> : AggregateViewAdapter<T> where T : INotifyPropertyChanged
+    internal class ContinuousAverageMonitorDoubleInt<T> : AggregateViewAdapter<T, int, double> where T : INotifyPropertyChanged
     {
-        protected ContinuousValue<double> _output;
-        protected Func<T, int> _averageFunc;
-
-        public ContinuousAverageMonitorDoubleInt(ObservableCollection<T> input,
+        public ContinuousAverageMonitorDoubleInt(InputCollectionWrapper<T> input,
             ContinuousValue<double> output,
             Func<T, int> averageFunc)
-            : base(input)
+            : base(input, output, averageFunc)
         {
-            _output = output;
-            _averageFunc = averageFunc;
         }
 
         protected override void ReAggregate()
         {
-            _output.CurrentValue = _input.Average(_averageFunc);
+            this.Output.CurrentValue = this.InputCollection.Average(this.AggFunc);
         }
     }
 
-    public class ContinuousAverageMonitorDoubleLong<T> : AggregateViewAdapter<T> where T : INotifyPropertyChanged
+    internal class ContinuousAverageMonitorDoubleLong<T> : AggregateViewAdapter<T, long, double> where T : INotifyPropertyChanged
     {
-        protected ContinuousValue<double> _output;
-        protected Func<T, long> _averageFunc;
-
-        public ContinuousAverageMonitorDoubleLong(ObservableCollection<T> input,
+        public ContinuousAverageMonitorDoubleLong(InputCollectionWrapper<T> input,
             ContinuousValue<double> output,
             Func<T, long> averageFunc)
-            : base(input)
+            : base(input, output, averageFunc)
         {
-            _output = output;
-            _averageFunc = averageFunc;
         }
 
         protected override void ReAggregate()
         {
-            _output.CurrentValue = _input.Average(_averageFunc);
+            this.Output.CurrentValue = this.InputCollection.Average(this.AggFunc);
         }
     }
-
 }

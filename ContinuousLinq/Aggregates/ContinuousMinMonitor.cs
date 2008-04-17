@@ -5,109 +5,83 @@
  * Created on: 04/16/2008
  */
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Linq;
 
 namespace ContinuousLinq.Aggregates
-{    
-    public class ContinuousMinMonitorInt<T> : AggregateViewAdapter<T> where T:INotifyPropertyChanged
+{
+    internal class ContinuousMinMonitorInt<T> : AggregateViewAdapter<T, int> where T : INotifyPropertyChanged
     {
-        private ContinuousValue<int> _output;
-        private Func<T, int> _minFunc;
-
-        public ContinuousMinMonitorInt(ObservableCollection<T> input,
-            ContinuousValue<int> output,
-            Func<T, int> minFunc)
-            : base(input)
+        public ContinuousMinMonitorInt(InputCollectionWrapper<T> input,
+                                       ContinuousValue<int> output,
+                                       Func<T, int> minFunc)
+            : base(input, output, minFunc)
         {
-            _output = output;
-            _minFunc = minFunc;
         }
 
         protected override void ReAggregate()
         {
-            _output.CurrentValue = _input.Min(_minFunc);
+            this.Output.CurrentValue = this.InputCollection.Min(this.AggFunc);
         }
     }
 
-    public class ContinuousMinMonitorLong<T> : AggregateViewAdapter<T> where T:INotifyPropertyChanged
+    internal class ContinuousMinMonitorLong<T> : AggregateViewAdapter<T, long> where T : INotifyPropertyChanged
     {
-        private ContinuousValue<long> _output;
-        private Func<T, long> _minFunc;
-
-        public ContinuousMinMonitorLong(ObservableCollection<T> input,
-            ContinuousValue<long> output,
-            Func<T, long> minFunc)
-            : base(input)
+        public ContinuousMinMonitorLong(InputCollectionWrapper<T> input,
+                                        ContinuousValue<long> output,
+                                        Func<T, long> minFunc)
+            : base(input, output, minFunc)
         {
-            _output = output;
-            _minFunc = minFunc;
         }
 
         protected override void ReAggregate()
         {
-            _output.CurrentValue = _input.Min(_minFunc);
+            this.Output.CurrentValue = this.InputCollection.Min(this.AggFunc);
         }
     }
 
-    public class ContinuousMinMonitorDouble<T> : AggregateViewAdapter<T> where T : INotifyPropertyChanged
+    internal class ContinuousMinMonitorDouble<T> : AggregateViewAdapter<T, double> where T : INotifyPropertyChanged
     {
-        private ContinuousValue<double> _output;
-        private Func<T, double> _minFunc;
-        public ContinuousMinMonitorDouble(ObservableCollection<T> input,
-            ContinuousValue<double> output,
-            Func<T, double> minFunc) : base(input)
+        public ContinuousMinMonitorDouble(InputCollectionWrapper<T> input,
+                                          ContinuousValue<double> output,
+                                          Func<T, double> minFunc)
+            : base(input, output, minFunc)
         {
-            _output = output;
-            _minFunc = minFunc;
         }
 
         protected override void ReAggregate()
         {
-            _output.CurrentValue = _input.Min(_minFunc);
+            this.Output.CurrentValue = this.InputCollection.Min(this.AggFunc);
         }
     }
 
-    public class ContinuousMinMonitorFloat<T> : AggregateViewAdapter<T> where T : INotifyPropertyChanged
+    internal class ContinuousMinMonitorFloat<T> : AggregateViewAdapter<T, float> where T : INotifyPropertyChanged
     {
-        private ContinuousValue<float> _output;
-        private Func<T, float> _minFunc;
-
-        public ContinuousMinMonitorFloat(ObservableCollection<T> input,
-            ContinuousValue<float> output,
-            Func<T, float> minFunc) 
-            : base(input)
+        public ContinuousMinMonitorFloat(InputCollectionWrapper<T> input,
+                                         ContinuousValue<float> output,
+                                         Func<T, float> minFunc)
+            : base(input, output, minFunc)
         {
-            _output = output;
-            _minFunc = minFunc;
         }
 
         protected override void ReAggregate()
         {
-            _output.CurrentValue = _input.Min(_minFunc);
+            this.Output.CurrentValue = this.InputCollection.Min(this.AggFunc);
         }
     }
 
-    public class ContinuousMinMonitorDecimal<T> : AggregateViewAdapter<T> where T : INotifyPropertyChanged
+    internal class ContinuousMinMonitorDecimal<T> : AggregateViewAdapter<T, decimal> where T : INotifyPropertyChanged
     {
-        private ContinuousValue<decimal> _output;
-        private Func<T, decimal> _minFunc;
-
-        public ContinuousMinMonitorDecimal(ObservableCollection<T> input,
-            ContinuousValue<decimal> output,
-            Func<T, decimal> minFunc) : base(input)
+        public ContinuousMinMonitorDecimal(InputCollectionWrapper<T> input,
+                                           ContinuousValue<decimal> output,
+                                           Func<T, decimal> minFunc)
+            : base(input, output, minFunc)
         {
-            _output = output;
-            _minFunc = minFunc;
         }
 
         protected override void ReAggregate()
         {
-            _output.CurrentValue = _input.Min(_minFunc);
+            this.Output.CurrentValue = this.InputCollection.Min(this.AggFunc);
         }
     }
-    
 }
