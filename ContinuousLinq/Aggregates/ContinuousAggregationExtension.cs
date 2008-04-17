@@ -78,7 +78,9 @@ namespace ContinuousLinq.Aggregates
                 input, output, sumFunc);
             return output;
         }
+        #endregion
 
+        #region COUNT
         public static ContinuousValue<int> ContinuousCount<T>(
             this ObservableCollection<T> input) where T: INotifyPropertyChanged
         {
