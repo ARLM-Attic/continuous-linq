@@ -93,6 +93,11 @@ namespace ContinuousLinq.Aggregates
             ReAggregate();
         }
 
+        protected void SetCurrentValue<U>(ContinuousValue<U> cv, U newValue)
+        {
+            cv.CurrentValue = newValue;
+        }
+
         protected abstract void ReAggregate();
     }
 }

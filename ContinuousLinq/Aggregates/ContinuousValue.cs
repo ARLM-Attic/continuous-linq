@@ -16,7 +16,7 @@ namespace ContinuousLinq.Aggregates
             {
                 return _realValue;
             }
-            set
+            internal set
             {
                 _realValue = value;
                 if (PropertyChanged != null)
