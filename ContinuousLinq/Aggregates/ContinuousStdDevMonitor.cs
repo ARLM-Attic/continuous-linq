@@ -1,11 +1,45 @@
 ﻿using System;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 
 namespace ContinuousLinq.Aggregates
 {
-    internal class ContinuousStdDevMonitorInt<T> : AggregateViewAdapter<T, int, double> where T : INotifyPropertyChanged
+    internal abstract class ContinuousStdDevMonitor<Tinput, Tfunc> : AggregateViewAdapter<Tinput> where Tinput : INotifyPropertyChanged
     {
-        public ContinuousStdDevMonitorInt(InputCollectionWrapper<T> input,
+        protected readonly Func<Tinput, Tfunc> _selector;
+        protected readonly ContinuousValue<double> _output;
+
+        protected ContinuousStdDevMonitor(ObservableCollection<Tinput> input,
+                                          ContinuousValue<double> output,
+                                          Func<Tinput, Tfunc> devValueSelector)
+            : base(input)
+        {
+            _output = output;
+            _selector = devValueSelector;
+            ReAggregate();
+        }
+
+        protected ContinuousStdDevMonitor(ReadOnlyObservableCollection<Tinput> input,
+                                          ContinuousValue<double> output,
+                                          Func<Tinput, Tfunc> devValueSelector)
+            : base(input)
+        {
+            _output = output;
+            _selector = devValueSelector;
+            ReAggregate();
+        }
+    }
+
+    internal class ContinuousStdDevMonitorInt<T> : ContinuousStdDevMonitor<T, int> where T : INotifyPropertyChanged
+    {
+        public ContinuousStdDevMonitorInt(ObservableCollection<T> input,
+                                          ContinuousValue<double> output,
+                                          Func<T, int> devValueSelector)
+            : base(input, output, devValueSelector)
+        {
+        }
+
+        public ContinuousStdDevMonitorInt(ReadOnlyObservableCollection<T> input,
                                           ContinuousValue<double> output,
                                           Func<T, int> devValueSelector)
             : base(input, output, devValueSelector)
@@ -14,13 +48,20 @@ namespace ContinuousLinq.Aggregates
 
         protected override void ReAggregate()
         {
-            this.Output.CurrentValue = StdDev.Compute(this.AggFunc, this.InputCollection);
+            _output.CurrentValue = StdDev.Compute(_selector, this.Input);
         }
     }
 
-    internal class ContinuousStdDevMonitorDouble<T> : AggregateViewAdapter<T, double, double> where T : INotifyPropertyChanged
+    internal class ContinuousStdDevMonitorDouble<T> : ContinuousStdDevMonitor<T, double> where T : INotifyPropertyChanged
     {
-        public ContinuousStdDevMonitorDouble(InputCollectionWrapper<T> input,
+        public ContinuousStdDevMonitorDouble(ObservableCollection<T> input,
+                                             ContinuousValue<double> output,
+                                             Func<T, double> devValueSelector)
+            : base(input, output, devValueSelector)
+        {
+        }
+
+        public ContinuousStdDevMonitorDouble(ReadOnlyObservableCollection<T> input,
                                              ContinuousValue<double> output,
                                              Func<T, double> devValueSelector)
             : base(input, output, devValueSelector)
@@ -29,13 +70,20 @@ namespace ContinuousLinq.Aggregates
 
         protected override void ReAggregate()
         {
-            this.Output.CurrentValue = StdDev.Compute(this.AggFunc, this.InputCollection);
+            _output.CurrentValue = StdDev.Compute(_selector, this.Input);
         }
     }
 
-    internal class ContinuousStdDevMonitorFloat<T> : AggregateViewAdapter<T, float, double> where T : INotifyPropertyChanged
+    internal class ContinuousStdDevMonitorFloat<T> : ContinuousStdDevMonitor<T, float> where T : INotifyPropertyChanged
     {
-        public ContinuousStdDevMonitorFloat(InputCollectionWrapper<T> input,
+        public ContinuousStdDevMonitorFloat(ObservableCollection<T> input,
+                                            ContinuousValue<double> output,
+                                            Func<T, float> devValueSelector)
+            : base(input, output, devValueSelector)
+        {
+        }
+
+        public ContinuousStdDevMonitorFloat(ReadOnlyObservableCollection<T> input,
                                             ContinuousValue<double> output,
                                             Func<T, float> devValueSelector)
             : base(input, output, devValueSelector)
@@ -44,13 +92,20 @@ namespace ContinuousLinq.Aggregates
 
         protected override void ReAggregate()
         {
-            this.Output.CurrentValue = StdDev.Compute(this.AggFunc, this.InputCollection);
+            _output.CurrentValue = StdDev.Compute(_selector, this.Input);
         }
     }
 
-    internal class ContinuousStdDevMonitorDecimal<T> : AggregateViewAdapter<T, decimal, double> where T : INotifyPropertyChanged
+    internal class ContinuousStdDevMonitorDecimal<T> : ContinuousStdDevMonitor<T, decimal> where T : INotifyPropertyChanged
     {
-        public ContinuousStdDevMonitorDecimal(InputCollectionWrapper<T> input,
+        public ContinuousStdDevMonitorDecimal(ObservableCollection<T> input,
+                                              ContinuousValue<double> output,
+                                              Func<T, decimal> devValueSelector)
+            : base(input, output, devValueSelector)
+        {
+        }
+
+        public ContinuousStdDevMonitorDecimal(ReadOnlyObservableCollection<T> input,
                                               ContinuousValue<double> output,
                                               Func<T, decimal> devValueSelector)
             : base(input, output, devValueSelector)
@@ -59,13 +114,20 @@ namespace ContinuousLinq.Aggregates
 
         protected override void ReAggregate()
         {
-            this.Output.CurrentValue = StdDev.Compute(this.AggFunc, this.InputCollection);
+            _output.CurrentValue = StdDev.Compute(_selector, this.Input);
         }
     }
 
-    internal class ContinuousStdDevMonitorLong<T> : AggregateViewAdapter<T, long, double> where T : INotifyPropertyChanged
+    internal class ContinuousStdDevMonitorLong<T> : ContinuousStdDevMonitor<T, long> where T : INotifyPropertyChanged
     {
-        public ContinuousStdDevMonitorLong(InputCollectionWrapper<T> input,
+        public ContinuousStdDevMonitorLong(ObservableCollection<T> input,
+                                           ContinuousValue<double> output,
+                                           Func<T, long> devValueSelector)
+            : base(input, output, devValueSelector)
+        {
+        }
+
+        public ContinuousStdDevMonitorLong(ReadOnlyObservableCollection<T> input,
                                            ContinuousValue<double> output,
                                            Func<T, long> devValueSelector)
             : base(input, output, devValueSelector)
@@ -74,7 +136,7 @@ namespace ContinuousLinq.Aggregates
 
         protected override void ReAggregate()
         {
-            this.Output.CurrentValue = StdDev.Compute(this.AggFunc, this.InputCollection);
+            _output.CurrentValue = StdDev.Compute(_selector, this.Input);
         }
     }
 }

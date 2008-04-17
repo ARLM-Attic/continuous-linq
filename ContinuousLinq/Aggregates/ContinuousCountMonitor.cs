@@ -1,17 +1,29 @@
-﻿using System.ComponentModel;
+﻿using System.Collections.ObjectModel;
+using System.ComponentModel;
 
 namespace ContinuousLinq.Aggregates
 {
-    internal class ContinuousCountMonitor<T> : AggregateViewAdapter<T, int> where T : INotifyPropertyChanged
+    internal class ContinuousCountMonitor<T> : AggregateViewAdapter<T> where T : INotifyPropertyChanged
     {
-        public ContinuousCountMonitor(InputCollectionWrapper<T> input, ContinuousValue<int> output)
-            : base(input, output, null)
+        private readonly ContinuousValue<int> _output;
+
+        public ContinuousCountMonitor(ObservableCollection<T> input, ContinuousValue<int> output)
+            : base(input)
         {
+            _output = output;
+            ReAggregate();
+        }
+
+        public ContinuousCountMonitor(ReadOnlyObservableCollection<T> input, ContinuousValue<int> output)
+            : base(input)
+        {
+            _output = output;
+            ReAggregate();
         }
 
         protected override void ReAggregate()
         {
-            this.Output.CurrentValue = this.InputCollection.Count;
+            _output.CurrentValue = this.Input.Count;
         }
     }
 }
