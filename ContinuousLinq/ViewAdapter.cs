@@ -5,7 +5,7 @@ using System.Collections.Specialized;
 
 namespace ContinuousLinq
 {
-    internal interface IViewAdapter
+    public interface IViewAdapter
     {
         IViewAdapter PreviousAdapter { get; }
         void ReEvaluate();
@@ -165,7 +165,7 @@ namespace ContinuousLinq
                     }
                     break;
                 case NotifyCollectionChangedAction.Reset:
-                    foreach (Tin item in _input.InnerAsList)
+                    foreach (Tin item in this.InputCollection)
                     {
                         UnsubscribeFromItem(item);
                     }
