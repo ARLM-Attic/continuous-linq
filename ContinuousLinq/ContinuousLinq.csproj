@@ -54,6 +54,14 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Aggregates\AggregateViewAdapter.cs" />
+    <Compile Include="Aggregates\ContinuousAggregationExtension.cs" />
+    <Compile Include="Aggregates\ContinuousAverageMonitor.cs" />
+    <Compile Include="Aggregates\ContinuousCountMonitor.cs" />
+    <Compile Include="Aggregates\ContinuousMaxMonitor.cs" />
+    <Compile Include="Aggregates\ContinuousMinMonitor.cs" />
+    <Compile Include="Aggregates\ContinuousSumMonitor.cs" />
+    <Compile Include="Aggregates\ContinuousValue.cs" />
     <Compile Include="ContinuousQueryExtension.cs" />
     <Compile Include="LinqContinuousCollection.cs" />
     <Compile Include="OutputCollectionWrapper.cs" />
