@@ -11,6 +11,7 @@ namespace ContinuousLinq.Aggregates
             : base(input)
         {
             _output = output;
+            _output.SourceAdapter = this;
             ReAggregate();
         }
 
@@ -18,6 +19,7 @@ namespace ContinuousLinq.Aggregates
             : base(input)
         {
             _output = output;
+            _output.SourceAdapter = this;
             ReAggregate();
         }
 

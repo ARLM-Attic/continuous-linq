@@ -15,7 +15,8 @@ namespace ContinuousLinq
     {
         private readonly INotifyCollectionChanged _owner;
 
-        public WeakCollectionChangedHandler(INotifyCollectionChanged owner, NotifyCollectionChangedEventHandler target) : base(target)
+        public WeakCollectionChangedHandler(INotifyCollectionChanged owner, 
+            NotifyCollectionChangedEventHandler target) : base(target)
         {
             _owner = owner;
             _owner.CollectionChanged += OnCollectionChanged;
@@ -28,10 +29,10 @@ namespace ContinuousLinq
         }
 
         private void OnCollectionChanged(object sender, NotifyCollectionChangedEventArgs args)
-        {
+        {            
             NotifyCollectionChangedEventHandler target = (NotifyCollectionChangedEventHandler)this.Target;
             if (target != null)
-            {
+            {              
                 target.Invoke(sender, args);
             }
             else

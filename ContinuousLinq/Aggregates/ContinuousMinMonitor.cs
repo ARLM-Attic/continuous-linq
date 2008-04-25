@@ -22,6 +22,7 @@ namespace ContinuousLinq.Aggregates
             : base(input)
         {
             _output = output;
+            _output.SourceAdapter = this;
             _minFunc = minFunc;
             ReAggregate();
         }
@@ -32,6 +33,7 @@ namespace ContinuousLinq.Aggregates
             : base(input)
         {
             _output = output;
+            _output.SourceAdapter = this;
             _minFunc = minFunc;
             ReAggregate();
         }
@@ -55,7 +57,8 @@ namespace ContinuousLinq.Aggregates
 
         protected override void ReAggregate()
         {
-            _output.CurrentValue = this.Input.Min(_minFunc);
+            if (this.Input.Count > 0)
+                _output.CurrentValue = this.Input.Min(_minFunc);
         }
     }
 
@@ -77,7 +80,8 @@ namespace ContinuousLinq.Aggregates
 
         protected override void ReAggregate()
         {
-            _output.CurrentValue = this.Input.Min(_minFunc);
+            if (this.Input.Count > 0)
+                _output.CurrentValue = this.Input.Min(_minFunc);
         }
     }
 
@@ -98,8 +102,9 @@ namespace ContinuousLinq.Aggregates
         }
 
         protected override void ReAggregate()
-        {
-            _output.CurrentValue = this.Input.Min(_minFunc);
+        {            
+            if (this.Input.Count > 0)
+                _output.CurrentValue = this.Input.Min(_minFunc);
         }
     }
 
@@ -121,7 +126,8 @@ namespace ContinuousLinq.Aggregates
 
         protected override void ReAggregate()
         {
-            _output.CurrentValue = this.Input.Min(_minFunc);
+            if (this.Input.Count > 0)
+                _output.CurrentValue = this.Input.Min(_minFunc);
         }
     }
 
@@ -143,7 +149,8 @@ namespace ContinuousLinq.Aggregates
 
         protected override void ReAggregate()
         {
-            _output.CurrentValue = this.Input.Min(_minFunc);
+            if (this.Input.Count > 0)
+                _output.CurrentValue = this.Input.Min(_minFunc);
         }
     }
 }

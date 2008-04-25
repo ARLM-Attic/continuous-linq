@@ -16,6 +16,7 @@ namespace ContinuousLinq.Aggregates
             : base(input)
         {
             _output = output;
+            _output.SourceAdapter = this;
             _sumFunc = sumFunc;
             ReAggregate();
         }
@@ -26,6 +27,7 @@ namespace ContinuousLinq.Aggregates
             : base(input)
         {
             _output = output;
+            _output.SourceAdapter = this;
             _sumFunc = sumFunc;
             ReAggregate();
         }
@@ -50,7 +52,8 @@ namespace ContinuousLinq.Aggregates
 
         protected override void ReAggregate()
         {
-            _output.CurrentValue = this.Input.Sum(_sumFunc);
+            if (this.Input.Count > 0)
+                _output.CurrentValue = this.Input.Sum(_sumFunc);
         }
     }
 
@@ -70,7 +73,8 @@ namespace ContinuousLinq.Aggregates
 
         protected override void ReAggregate()
         {
-            _output.CurrentValue = this.Input.Sum(_sumFunc);
+            if (this.Input.Count > 0)
+                _output.CurrentValue = this.Input.Sum(_sumFunc);
         }
     }
 
@@ -90,7 +94,8 @@ namespace ContinuousLinq.Aggregates
 
         protected override void ReAggregate()
         {
-            _output.CurrentValue = this.Input.Sum(_sumFunc);
+            if (this.Input.Count > 0)
+                _output.CurrentValue = this.Input.Sum(_sumFunc);
         }
     }
 
@@ -110,7 +115,8 @@ namespace ContinuousLinq.Aggregates
 
         protected override void ReAggregate()
         {
-            _output.CurrentValue = this.Input.Sum(_sumFunc);
+            if (this.Input.Count > 0)
+                _output.CurrentValue = this.Input.Sum(_sumFunc);
         }
     }
 
@@ -130,7 +136,8 @@ namespace ContinuousLinq.Aggregates
 
         protected override void ReAggregate()
         {
-            _output.CurrentValue = this.Input.Sum(_sumFunc);
+            if (this.Input.Count > 0)
+                _output.CurrentValue = this.Input.Sum(_sumFunc);
         }
     }
 }

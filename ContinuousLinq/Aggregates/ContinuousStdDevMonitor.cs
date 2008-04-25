@@ -15,6 +15,7 @@ namespace ContinuousLinq.Aggregates
             : base(input)
         {
             _output = output;
+            _output.SourceAdapter = this;
             _selector = devValueSelector;
             ReAggregate();
         }
@@ -25,6 +26,7 @@ namespace ContinuousLinq.Aggregates
             : base(input)
         {
             _output = output;
+            _output.SourceAdapter = this;
             _selector = devValueSelector;
             ReAggregate();
         }
@@ -48,7 +50,8 @@ namespace ContinuousLinq.Aggregates
 
         protected override void ReAggregate()
         {
-            _output.CurrentValue = StdDev.Compute(_selector, this.Input);
+            if (this.Input.Count > 0)
+                _output.CurrentValue = StdDev.Compute(_selector, this.Input);
         }
     }
 
@@ -70,7 +73,8 @@ namespace ContinuousLinq.Aggregates
 
         protected override void ReAggregate()
         {
-            _output.CurrentValue = StdDev.Compute(_selector, this.Input);
+            if (this.Input.Count > 0)
+                _output.CurrentValue = StdDev.Compute(_selector, this.Input);
         }
     }
 
@@ -92,7 +96,8 @@ namespace ContinuousLinq.Aggregates
 
         protected override void ReAggregate()
         {
-            _output.CurrentValue = StdDev.Compute(_selector, this.Input);
+            if (this.Input.Count > 0)
+                _output.CurrentValue = StdDev.Compute(_selector, this.Input);
         }
     }
 
@@ -114,7 +119,8 @@ namespace ContinuousLinq.Aggregates
 
         protected override void ReAggregate()
         {
-            _output.CurrentValue = StdDev.Compute(_selector, this.Input);
+            if (this.Input.Count > 0)
+                _output.CurrentValue = StdDev.Compute(_selector, this.Input);
         }
     }
 
@@ -136,7 +142,8 @@ namespace ContinuousLinq.Aggregates
 
         protected override void ReAggregate()
         {
-            _output.CurrentValue = StdDev.Compute(_selector, this.Input);
+            if (this.Input.Count > 0)
+                _output.CurrentValue = StdDev.Compute(_selector, this.Input);
         }
     }
 }

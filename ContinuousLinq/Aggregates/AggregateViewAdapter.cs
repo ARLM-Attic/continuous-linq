@@ -2,6 +2,7 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Collections.Specialized;
+using System;
 
 namespace ContinuousLinq.Aggregates
 {
@@ -11,21 +12,28 @@ namespace ContinuousLinq.Aggregates
         private readonly NotifyCollectionChangedEventHandler _collectionChangedDelegate;
         private readonly PropertyChangedEventHandler _propertyChangedDelegate;
         private readonly Dictionary<T, WeakPropertyChangedHandler> _handlerMap =
-            new Dictionary<T, WeakPropertyChangedHandler>();
+            new Dictionary<T, WeakPropertyChangedHandler>();        
 
-        protected AggregateViewAdapter(ObservableCollection<T> input) : this(new InputCollectionWrapper<T>(input))
+        protected AggregateViewAdapter(ObservableCollection<T> input) :
+            this(new InputCollectionWrapper<T>(input))
         {
         }
 
-        protected AggregateViewAdapter(ReadOnlyObservableCollection<T> input) : this(new InputCollectionWrapper<T>(input))
+        protected AggregateViewAdapter(ReadOnlyObservableCollection<T> input) : 
+            this(new InputCollectionWrapper<T>(input))
         {
         }
 
         private AggregateViewAdapter(InputCollectionWrapper<T> input)
         {
             _input = input;
+            
+           _collectionChangedDelegate = 
+               delegate(object sender, NotifyCollectionChangedEventArgs args)
+           {
+               OnInputCollectionChanged(args);
+           };
 
-            _collectionChangedDelegate = ((sender, args) => OnInputCollectionChanged(args));
             _propertyChangedDelegate = ((sender, e) => ReAggregate());
 
             new WeakCollectionChangedHandler(input.InnerAsNotifier, _collectionChangedDelegate);
@@ -70,6 +78,7 @@ namespace ContinuousLinq.Aggregates
 
         void OnInputCollectionChanged(NotifyCollectionChangedEventArgs e)
         {
+            Console.WriteLine("[AVA] Input changed...");
             switch (e.Action)
             {
                 case NotifyCollectionChangedAction.Remove:
@@ -96,6 +105,11 @@ namespace ContinuousLinq.Aggregates
         protected void SetCurrentValue<U>(ContinuousValue<U> cv, U newValue)
         {
             cv.CurrentValue = newValue;
+        }
+
+        protected void SetSourceAdapter<U>(ContinuousValue<U> output, object adapter)
+        {
+            output.SourceAdapter = adapter;
         }
 
         protected abstract void ReAggregate();

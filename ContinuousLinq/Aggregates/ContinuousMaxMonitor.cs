@@ -11,7 +11,8 @@ using System.Linq;
 
 namespace ContinuousLinq.Aggregates
 {
-    internal abstract class ContinuousMaxMonitor<Tinput, Toutput> : AggregateViewAdapter<Tinput> where Tinput : INotifyPropertyChanged
+    internal abstract class ContinuousMaxMonitor<Tinput, Toutput> : 
+        AggregateViewAdapter<Tinput> where Tinput : INotifyPropertyChanged
     {
         protected readonly ContinuousValue<Toutput> _output;
         protected readonly Func<Tinput, Toutput> _maxFunc;
@@ -22,6 +23,7 @@ namespace ContinuousLinq.Aggregates
             : base(input)
         {
             _output = output;
+            _output.SourceAdapter = this; // backreference required to avoid premature GC from weak references!
             _maxFunc = maxFunc;
             ReAggregate();
         }
@@ -32,6 +34,7 @@ namespace ContinuousLinq.Aggregates
             : base(input)
         {
             _output = output;
+            _output.SourceAdapter = this;
             _maxFunc = maxFunc;
             ReAggregate();
         }
@@ -81,7 +84,8 @@ namespace ContinuousLinq.Aggregates
         }
     }
 
-    internal class ContinuousMaxMonitorDouble<T> : ContinuousMaxMonitor<T, double> where T : INotifyPropertyChanged
+    internal class ContinuousMaxMonitorDouble<T> : 
+        ContinuousMaxMonitor<T, double> where T : INotifyPropertyChanged
     {
         public ContinuousMaxMonitorDouble(ObservableCollection<T> input,
                                           ContinuousValue<double> output,
@@ -99,7 +103,8 @@ namespace ContinuousLinq.Aggregates
 
         protected override void ReAggregate()
         {
-            _output.CurrentValue = this.Input.Max(_maxFunc);
+            if (this.Input.Count > 0)
+                _output.CurrentValue = this.Input.Max(_maxFunc);
         }
     }
 
