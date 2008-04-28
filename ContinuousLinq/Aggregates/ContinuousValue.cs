@@ -39,6 +39,22 @@ namespace ContinuousLinq.Aggregates
         }
 
 
+        public override bool Equals(object obj)
+        {
+            ContinuousValue<T> other = obj as ContinuousValue<T>;
+            return other != null && _realValue.Equals(other);
+        }
+
+        public override int GetHashCode()
+        {
+            return _realValue.GetHashCode();
+        }
+
+        public override string ToString()
+        {
+            return _realValue.ToString();
+        }
+
         #region INotifyPropertyChanged Members
 
         public event PropertyChangedEventHandler PropertyChanged;
