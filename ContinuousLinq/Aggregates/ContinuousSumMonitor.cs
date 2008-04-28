@@ -53,7 +53,14 @@ namespace ContinuousLinq.Aggregates
         protected override void ReAggregate()
         {
             if (this.Input.Count > 0)
+            {
                 _output.CurrentValue = this.Input.Sum(_sumFunc);
+            }
+            else
+            {
+                _output.CurrentValue = default(int);
+            }
+
         }
     }
 
@@ -74,7 +81,14 @@ namespace ContinuousLinq.Aggregates
         protected override void ReAggregate()
         {
             if (this.Input.Count > 0)
+            {
                 _output.CurrentValue = this.Input.Sum(_sumFunc);
+            }
+            else
+            {
+                _output.CurrentValue = default(double);
+            }
+
         }
     }
 
@@ -95,7 +109,14 @@ namespace ContinuousLinq.Aggregates
         protected override void ReAggregate()
         {
             if (this.Input.Count > 0)
+            {
                 _output.CurrentValue = this.Input.Sum(_sumFunc);
+            }
+            else
+            {
+                _output.CurrentValue = default(decimal);
+            }
+
         }
     }
 
@@ -116,7 +137,14 @@ namespace ContinuousLinq.Aggregates
         protected override void ReAggregate()
         {
             if (this.Input.Count > 0)
+            {
                 _output.CurrentValue = this.Input.Sum(_sumFunc);
+            }
+            else
+            {
+                _output.CurrentValue = default(float);
+            }
+
         }
     }
 
@@ -137,7 +165,14 @@ namespace ContinuousLinq.Aggregates
         protected override void ReAggregate()
         {
             if (this.Input.Count > 0)
+            {
                 _output.CurrentValue = this.Input.Sum(_sumFunc);
+            }
+            else
+            {
+                _output.CurrentValue = default(long);
+            }
+
         }
     }
 }

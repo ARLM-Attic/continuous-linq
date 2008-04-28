@@ -51,7 +51,13 @@ namespace ContinuousLinq.Aggregates
         protected override void ReAggregate()
         {
             if (this.Input.Count > 0)
+            {
                 _output.CurrentValue = StdDev.Compute(_selector, this.Input);
+            }
+            else
+            {
+                _output.CurrentValue = default(double);
+            }
         }
     }
 
@@ -74,7 +80,13 @@ namespace ContinuousLinq.Aggregates
         protected override void ReAggregate()
         {
             if (this.Input.Count > 0)
+            {
                 _output.CurrentValue = StdDev.Compute(_selector, this.Input);
+            }
+            else
+            {
+                _output.CurrentValue = default(double);
+            }
         }
     }
 
@@ -97,7 +109,13 @@ namespace ContinuousLinq.Aggregates
         protected override void ReAggregate()
         {
             if (this.Input.Count > 0)
+            {
                 _output.CurrentValue = StdDev.Compute(_selector, this.Input);
+            }
+            else
+            {
+                _output.CurrentValue = default(double);
+            }
         }
     }
 
@@ -120,7 +138,13 @@ namespace ContinuousLinq.Aggregates
         protected override void ReAggregate()
         {
             if (this.Input.Count > 0)
+            {
                 _output.CurrentValue = StdDev.Compute(_selector, this.Input);
+            }
+            else
+            {
+                _output.CurrentValue = default(double);
+            }
         }
     }
 
@@ -142,8 +166,14 @@ namespace ContinuousLinq.Aggregates
 
         protected override void ReAggregate()
         {
-            if (this.Input.Count > 0)
+            if (this.Input.Count > 0) 
+            {
                 _output.CurrentValue = StdDev.Compute(_selector, this.Input);
+            }
+            else
+            {
+                _output.CurrentValue = default(double);
+            }
         }
     }
 }

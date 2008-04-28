@@ -104,7 +104,13 @@ namespace ContinuousLinq.Aggregates
         protected override void ReAggregate()
         {
             if (this.Input.Count > 0)
+            {
                 _output.CurrentValue = this.Input.Max(_maxFunc);
+            }
+            else
+            {
+                _output.CurrentValue = default(double);
+            }
         }
     }
 

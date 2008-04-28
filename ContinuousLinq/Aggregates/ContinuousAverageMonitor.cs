@@ -60,7 +60,13 @@ namespace ContinuousLinq.Aggregates
         protected override void ReAggregate()
         {
             if (this.Input.Count > 0)
+            {
                 _output.CurrentValue = this.Input.Average(_averageFunc);
+            }
+            else
+            {
+                _output.CurrentValue = default(decimal);
+            }
         }
     }
 
@@ -84,7 +90,13 @@ namespace ContinuousLinq.Aggregates
         protected override void ReAggregate()
         {
             if (this.Input.Count > 0)
+            {
                 _output.CurrentValue = this.Input.Average(_averageFunc);
+            }
+            else
+            {
+                _output.CurrentValue = default(double);
+            }
         }
     }
 
@@ -108,7 +120,13 @@ namespace ContinuousLinq.Aggregates
         protected override void ReAggregate()
         {
             if (this.Input.Count > 0)
+            {
                 _output.CurrentValue = this.Input.Average(_averageFunc);
+            }
+            else
+            {
+                _output.CurrentValue = default(float);
+            }
         }
     }
 
@@ -131,7 +149,13 @@ namespace ContinuousLinq.Aggregates
         protected override void ReAggregate()
         {
             if (this.Input.Count > 0)
+            {
                 _output.CurrentValue = this.Input.Average(_averageFunc);
+            }
+            else
+            {
+                _output.CurrentValue = default(double);
+            }
         }
     }
 
@@ -154,7 +178,13 @@ namespace ContinuousLinq.Aggregates
         protected override void ReAggregate()
         {
             if (this.Input.Count > 0)
+            {
                 _output.CurrentValue = this.Input.Average(_averageFunc);
+            }
+            else
+            {
+                _output.CurrentValue = default(double);
+            }
         }
     }
 }
