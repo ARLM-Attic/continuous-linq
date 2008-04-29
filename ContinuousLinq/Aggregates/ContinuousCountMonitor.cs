@@ -3,29 +3,23 @@ using System.ComponentModel;
 
 namespace ContinuousLinq.Aggregates
 {
-    internal class ContinuousCountMonitor<T> : AggregateViewAdapter<T> where T : INotifyPropertyChanged
+    internal class ContinuousCountMonitor<T> : AggregateViewAdapter<T, int> where T : INotifyPropertyChanged
     {
-        private readonly ContinuousValue<int> _output;
-
-        public ContinuousCountMonitor(ObservableCollection<T> input, ContinuousValue<int> output)
+        public ContinuousCountMonitor(ObservableCollection<T> input)
             : base(input)
         {
-            _output = output;
-            _output.SourceAdapter = this;
             ReAggregate();
         }
 
-        public ContinuousCountMonitor(ReadOnlyObservableCollection<T> input, ContinuousValue<int> output)
+        public ContinuousCountMonitor(ReadOnlyObservableCollection<T> input)
             : base(input)
         {
-            _output = output;
-            _output.SourceAdapter = this;
             ReAggregate();
         }
 
         protected override void ReAggregate()
         {
-            _output.CurrentValue = this.Input.Count;
+            SetCurrentValue(this.Input.Count);
         }
     }
 }

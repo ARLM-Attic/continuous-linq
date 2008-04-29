@@ -5,29 +5,22 @@ using System.Linq;
 
 namespace ContinuousLinq.Aggregates
 {
-    internal abstract class ContinuousSumMonitor<Tinput, Toutput> : AggregateViewAdapter<Tinput> where Tinput : INotifyPropertyChanged
+    internal abstract class ContinuousSumMonitor<Tinput, Toutput> : AggregateViewAdapter<Tinput, Toutput> where Tinput : INotifyPropertyChanged
     {
-        protected readonly ContinuousValue<Toutput> _output;
         protected readonly Func<Tinput, Toutput> _sumFunc;
 
         protected ContinuousSumMonitor(ObservableCollection<Tinput> input,
-                                       ContinuousValue<Toutput> output,
                                        Func<Tinput, Toutput> sumFunc)
             : base(input)
         {
-            _output = output;
-            _output.SourceAdapter = this;
             _sumFunc = sumFunc;
             ReAggregate();
         }
 
         protected ContinuousSumMonitor(ReadOnlyObservableCollection<Tinput> input,
-                                       ContinuousValue<Toutput> output,
                                        Func<Tinput, Toutput> sumFunc)
             : base(input)
         {
-            _output = output;
-            _output.SourceAdapter = this;
             _sumFunc = sumFunc;
             ReAggregate();
         }
@@ -37,16 +30,14 @@ namespace ContinuousLinq.Aggregates
     internal class ContinuousSumMonitorInt<T> : ContinuousSumMonitor<T, int> where T : INotifyPropertyChanged
     {
         public ContinuousSumMonitorInt(ObservableCollection<T> input,
-                                       ContinuousValue<int> output,
                                        Func<T, int> sumFunc)
-            : base(input, output, sumFunc)
+            : base(input, sumFunc)
         {
         }
 
         public ContinuousSumMonitorInt(ReadOnlyObservableCollection<T> input,
-                                       ContinuousValue<int> output,
                                        Func<T, int> sumFunc)
-            : base(input, output, sumFunc)
+            : base(input, sumFunc)
         {
         }
 
@@ -54,27 +45,26 @@ namespace ContinuousLinq.Aggregates
         {
             if (this.Input.Count > 0)
             {
-                _output.CurrentValue = this.Input.Sum(_sumFunc);
+                SetCurrentValue(this.Input.Sum(_sumFunc));
             }
             else
             {
-                _output.CurrentValue = default(int);
+                SetCurrentValueToDefault();
             }
-
         }
     }
 
     internal class ContinuousSumMonitorDouble<T> : ContinuousSumMonitor<T, double> where T : INotifyPropertyChanged
     {
-        public ContinuousSumMonitorDouble(ObservableCollection<T> input, ContinuousValue<double> output,
+        public ContinuousSumMonitorDouble(ObservableCollection<T> input,
                                           Func<T, double> sumFunc)
-            : base(input, output, sumFunc)
+            : base(input, sumFunc)
         {
         }
 
-        public ContinuousSumMonitorDouble(ReadOnlyObservableCollection<T> input, ContinuousValue<double> output,
+        public ContinuousSumMonitorDouble(ReadOnlyObservableCollection<T> input,
                                           Func<T, double> sumFunc)
-            : base(input, output, sumFunc)
+            : base(input, sumFunc)
         {
         }
 
@@ -82,27 +72,26 @@ namespace ContinuousLinq.Aggregates
         {
             if (this.Input.Count > 0)
             {
-                _output.CurrentValue = this.Input.Sum(_sumFunc);
+                SetCurrentValue(this.Input.Sum(_sumFunc));
             }
             else
             {
-                _output.CurrentValue = default(double);
+                SetCurrentValueToDefault();
             }
-
         }
     }
 
     internal class ContinuousSumMonitorDecimal<T> : ContinuousSumMonitor<T, decimal> where T : INotifyPropertyChanged
     {
-        public ContinuousSumMonitorDecimal(ObservableCollection<T> input, ContinuousValue<decimal> output,
+        public ContinuousSumMonitorDecimal(ObservableCollection<T> input,
                                            Func<T, decimal> sumFunc)
-            : base(input, output, sumFunc)
+            : base(input, sumFunc)
         {
         }
 
-        public ContinuousSumMonitorDecimal(ReadOnlyObservableCollection<T> input, ContinuousValue<decimal> output,
+        public ContinuousSumMonitorDecimal(ReadOnlyObservableCollection<T> input,
                                            Func<T, decimal> sumFunc)
-            : base(input, output, sumFunc)
+            : base(input, sumFunc)
         {
         }
 
@@ -110,27 +99,26 @@ namespace ContinuousLinq.Aggregates
         {
             if (this.Input.Count > 0)
             {
-                _output.CurrentValue = this.Input.Sum(_sumFunc);
+                SetCurrentValue(this.Input.Sum(_sumFunc));
             }
             else
             {
-                _output.CurrentValue = default(decimal);
+                SetCurrentValueToDefault();
             }
-
         }
     }
 
     internal class ContinuousSumMonitorFloat<T> : ContinuousSumMonitor<T, float> where T : INotifyPropertyChanged
     {
-        public ContinuousSumMonitorFloat(ObservableCollection<T> input, ContinuousValue<float> output,
+        public ContinuousSumMonitorFloat(ObservableCollection<T> input,
                                          Func<T, float> sumFunc)
-            : base(input, output, sumFunc)
+            : base(input, sumFunc)
         {
         }
 
-        public ContinuousSumMonitorFloat(ReadOnlyObservableCollection<T> input, ContinuousValue<float> output,
+        public ContinuousSumMonitorFloat(ReadOnlyObservableCollection<T> input,
                                          Func<T, float> sumFunc)
-            : base(input, output, sumFunc)
+            : base(input, sumFunc)
         {
         }
 
@@ -138,27 +126,26 @@ namespace ContinuousLinq.Aggregates
         {
             if (this.Input.Count > 0)
             {
-                _output.CurrentValue = this.Input.Sum(_sumFunc);
+                SetCurrentValue(this.Input.Sum(_sumFunc));
             }
             else
             {
-                _output.CurrentValue = default(float);
+                SetCurrentValueToDefault();
             }
-
         }
     }
 
     internal class ContinuousSumMonitorLong<T> : ContinuousSumMonitor<T, long> where T : INotifyPropertyChanged
     {
-        public ContinuousSumMonitorLong(ObservableCollection<T> input, ContinuousValue<long> output,
+        public ContinuousSumMonitorLong(ObservableCollection<T> input,
                                         Func<T, long> sumFunc)
-            : base(input, output, sumFunc)
+            : base(input, sumFunc)
         {
         }
 
-        public ContinuousSumMonitorLong(ReadOnlyObservableCollection<T> input, ContinuousValue<long> output,
+        public ContinuousSumMonitorLong(ReadOnlyObservableCollection<T> input,
                                         Func<T, long> sumFunc)
-            : base(input, output, sumFunc)
+            : base(input, sumFunc)
         {
         }
 
@@ -166,13 +153,12 @@ namespace ContinuousLinq.Aggregates
         {
             if (this.Input.Count > 0)
             {
-                _output.CurrentValue = this.Input.Sum(_sumFunc);
+                SetCurrentValue(this.Input.Sum(_sumFunc));
             }
             else
             {
-                _output.CurrentValue = default(long);
+                SetCurrentValueToDefault();
             }
-
         }
     }
 }

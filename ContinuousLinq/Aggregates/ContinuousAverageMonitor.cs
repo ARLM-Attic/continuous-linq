@@ -11,30 +11,23 @@ using System.Linq;
 
 namespace ContinuousLinq.Aggregates
 {
-    internal abstract class ContinuousAverageMonitor<Tinput, Tfunc, Toutput> : AggregateViewAdapter<Tinput>
+    internal abstract class ContinuousAverageMonitor<Tinput, Tfunc, Toutput> : AggregateViewAdapter<Tinput, Toutput>
         where Tinput : INotifyPropertyChanged
     {
-        protected readonly ContinuousValue<Toutput> _output;
         protected readonly Func<Tinput, Tfunc> _averageFunc;
 
         protected ContinuousAverageMonitor(ObservableCollection<Tinput> input,
-                                           ContinuousValue<Toutput> output,
                                            Func<Tinput, Tfunc> averageFunc)
             : base(input)
         {
-            _output = output;
-            _output.SourceAdapter = this;
             _averageFunc = averageFunc;
             ReAggregate();
         }
 
         protected ContinuousAverageMonitor(ReadOnlyObservableCollection<Tinput> input,
-                                           ContinuousValue<Toutput> output,
                                            Func<Tinput, Tfunc> averageFunc)
             : base(input)
         {
-            _output = output;
-            _output.SourceAdapter = this;
             _averageFunc = averageFunc;
             ReAggregate();
         }
@@ -44,16 +37,14 @@ namespace ContinuousLinq.Aggregates
         where T : INotifyPropertyChanged
     {
         public ContinuousAverageMonitorDecimal(ObservableCollection<T> input,
-                                               ContinuousValue<decimal> output,
                                                Func<T, decimal> averageFunc)
-            : base(input, output, averageFunc)
+            : base(input, averageFunc)
         {
         }
 
         public ContinuousAverageMonitorDecimal(ReadOnlyObservableCollection<T> input,
-                                               ContinuousValue<decimal> output,
                                                Func<T, decimal> averageFunc)
-            : base(input, output, averageFunc)
+            : base(input, averageFunc)
         {
         }
 
@@ -61,11 +52,11 @@ namespace ContinuousLinq.Aggregates
         {
             if (this.Input.Count > 0)
             {
-                _output.CurrentValue = this.Input.Average(_averageFunc);
+                SetCurrentValue(this.Input.Average(_averageFunc));
             }
             else
             {
-                _output.CurrentValue = default(decimal);
+                SetCurrentValueToDefault();
             }
         }
     }
@@ -74,16 +65,14 @@ namespace ContinuousLinq.Aggregates
         where T : INotifyPropertyChanged
     {
         public ContinuousAverageMonitorDouble(ObservableCollection<T> input,
-                                              ContinuousValue<double> output,
                                               Func<T, double> averageFunc)
-            : base(input, output, averageFunc)
+            : base(input, averageFunc)
         {
         }
 
         public ContinuousAverageMonitorDouble(ReadOnlyObservableCollection<T> input,
-                                              ContinuousValue<double> output,
                                               Func<T, double> averageFunc)
-            : base(input, output, averageFunc)
+            : base(input, averageFunc)
         {
         }
 
@@ -91,11 +80,11 @@ namespace ContinuousLinq.Aggregates
         {
             if (this.Input.Count > 0)
             {
-                _output.CurrentValue = this.Input.Average(_averageFunc);
+                SetCurrentValue(this.Input.Average(_averageFunc));
             }
             else
             {
-                _output.CurrentValue = default(double);
+                SetCurrentValueToDefault();
             }
         }
     }
@@ -104,16 +93,14 @@ namespace ContinuousLinq.Aggregates
         where T : INotifyPropertyChanged
     {
         public ContinuousAverageMonitorFloat(ObservableCollection<T> input,
-                                             ContinuousValue<float> output,
                                              Func<T, float> averageFunc)
-            : base(input, output, averageFunc)
+            : base(input, averageFunc)
         {
         }
 
         public ContinuousAverageMonitorFloat(ReadOnlyObservableCollection<T> input,
-                                             ContinuousValue<float> output,
                                              Func<T, float> averageFunc)
-            : base(input, output, averageFunc)
+            : base(input, averageFunc)
         {
         }
 
@@ -121,11 +108,11 @@ namespace ContinuousLinq.Aggregates
         {
             if (this.Input.Count > 0)
             {
-                _output.CurrentValue = this.Input.Average(_averageFunc);
+                SetCurrentValue(this.Input.Average(_averageFunc));
             }
             else
             {
-                _output.CurrentValue = default(float);
+                SetCurrentValueToDefault();
             }
         }
     }
@@ -133,16 +120,14 @@ namespace ContinuousLinq.Aggregates
     internal class ContinuousAverageMonitorDoubleInt<T> : ContinuousAverageMonitor<T, int, double> where T : INotifyPropertyChanged
     {
         public ContinuousAverageMonitorDoubleInt(ObservableCollection<T> input,
-                                                 ContinuousValue<double> output,
                                                  Func<T, int> averageFunc)
-            : base(input, output, averageFunc)
+            : base(input, averageFunc)
         {
         }
 
         public ContinuousAverageMonitorDoubleInt(ReadOnlyObservableCollection<T> input,
-                                                 ContinuousValue<double> output,
                                                  Func<T, int> averageFunc)
-            : base(input, output, averageFunc)
+            : base(input, averageFunc)
         {
         }
 
@@ -150,11 +135,11 @@ namespace ContinuousLinq.Aggregates
         {
             if (this.Input.Count > 0)
             {
-                _output.CurrentValue = this.Input.Average(_averageFunc);
+                SetCurrentValue(this.Input.Average(_averageFunc));
             }
             else
             {
-                _output.CurrentValue = default(double);
+                SetCurrentValueToDefault();
             }
         }
     }
@@ -162,16 +147,14 @@ namespace ContinuousLinq.Aggregates
     internal class ContinuousAverageMonitorDoubleLong<T> : ContinuousAverageMonitor<T, long, double> where T : INotifyPropertyChanged
     {
         public ContinuousAverageMonitorDoubleLong(ObservableCollection<T> input,
-                                                  ContinuousValue<double> output,
                                                   Func<T, long> averageFunc)
-            : base(input, output, averageFunc)
+            : base(input, averageFunc)
         {
         }
 
         public ContinuousAverageMonitorDoubleLong(ReadOnlyObservableCollection<T> input,
-                                                  ContinuousValue<double> output,
                                                   Func<T, long> averageFunc)
-            : base(input, output, averageFunc)
+            : base(input, averageFunc)
         {
         }
 
@@ -179,11 +162,11 @@ namespace ContinuousLinq.Aggregates
         {
             if (this.Input.Count > 0)
             {
-                _output.CurrentValue = this.Input.Average(_averageFunc);
+                SetCurrentValue(this.Input.Average(_averageFunc));
             }
             else
             {
-                _output.CurrentValue = default(double);
+                SetCurrentValueToDefault();
             }
         }
     }

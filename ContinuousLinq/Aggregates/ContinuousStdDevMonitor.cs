@@ -4,29 +4,22 @@ using System.ComponentModel;
 
 namespace ContinuousLinq.Aggregates
 {
-    internal abstract class ContinuousStdDevMonitor<Tinput, Tfunc> : AggregateViewAdapter<Tinput> where Tinput : INotifyPropertyChanged
+    internal abstract class ContinuousStdDevMonitor<Tinput, Tfunc> : AggregateViewAdapter<Tinput, double> where Tinput : INotifyPropertyChanged
     {
         protected readonly Func<Tinput, Tfunc> _selector;
-        protected readonly ContinuousValue<double> _output;
 
         protected ContinuousStdDevMonitor(ObservableCollection<Tinput> input,
-                                          ContinuousValue<double> output,
                                           Func<Tinput, Tfunc> devValueSelector)
             : base(input)
         {
-            _output = output;
-            _output.SourceAdapter = this;
             _selector = devValueSelector;
             ReAggregate();
         }
 
         protected ContinuousStdDevMonitor(ReadOnlyObservableCollection<Tinput> input,
-                                          ContinuousValue<double> output,
                                           Func<Tinput, Tfunc> devValueSelector)
             : base(input)
         {
-            _output = output;
-            _output.SourceAdapter = this;
             _selector = devValueSelector;
             ReAggregate();
         }
@@ -35,16 +28,14 @@ namespace ContinuousLinq.Aggregates
     internal class ContinuousStdDevMonitorInt<T> : ContinuousStdDevMonitor<T, int> where T : INotifyPropertyChanged
     {
         public ContinuousStdDevMonitorInt(ObservableCollection<T> input,
-                                          ContinuousValue<double> output,
                                           Func<T, int> devValueSelector)
-            : base(input, output, devValueSelector)
+            : base(input, devValueSelector)
         {
         }
 
         public ContinuousStdDevMonitorInt(ReadOnlyObservableCollection<T> input,
-                                          ContinuousValue<double> output,
                                           Func<T, int> devValueSelector)
-            : base(input, output, devValueSelector)
+            : base(input, devValueSelector)
         {
         }
 
@@ -52,11 +43,11 @@ namespace ContinuousLinq.Aggregates
         {
             if (this.Input.Count > 0)
             {
-                _output.CurrentValue = StdDev.Compute(_selector, this.Input);
+                SetCurrentValue(StdDev.Compute(_selector, this.Input));
             }
             else
             {
-                _output.CurrentValue = default(double);
+                SetCurrentValueToDefault();
             }
         }
     }
@@ -64,16 +55,14 @@ namespace ContinuousLinq.Aggregates
     internal class ContinuousStdDevMonitorDouble<T> : ContinuousStdDevMonitor<T, double> where T : INotifyPropertyChanged
     {
         public ContinuousStdDevMonitorDouble(ObservableCollection<T> input,
-                                             ContinuousValue<double> output,
                                              Func<T, double> devValueSelector)
-            : base(input, output, devValueSelector)
+            : base(input, devValueSelector)
         {
         }
 
         public ContinuousStdDevMonitorDouble(ReadOnlyObservableCollection<T> input,
-                                             ContinuousValue<double> output,
                                              Func<T, double> devValueSelector)
-            : base(input, output, devValueSelector)
+            : base(input, devValueSelector)
         {
         }
 
@@ -81,11 +70,11 @@ namespace ContinuousLinq.Aggregates
         {
             if (this.Input.Count > 0)
             {
-                _output.CurrentValue = StdDev.Compute(_selector, this.Input);
+                SetCurrentValue(StdDev.Compute(_selector, this.Input));
             }
             else
             {
-                _output.CurrentValue = default(double);
+                SetCurrentValueToDefault();
             }
         }
     }
@@ -93,16 +82,14 @@ namespace ContinuousLinq.Aggregates
     internal class ContinuousStdDevMonitorFloat<T> : ContinuousStdDevMonitor<T, float> where T : INotifyPropertyChanged
     {
         public ContinuousStdDevMonitorFloat(ObservableCollection<T> input,
-                                            ContinuousValue<double> output,
                                             Func<T, float> devValueSelector)
-            : base(input, output, devValueSelector)
+            : base(input, devValueSelector)
         {
         }
 
         public ContinuousStdDevMonitorFloat(ReadOnlyObservableCollection<T> input,
-                                            ContinuousValue<double> output,
                                             Func<T, float> devValueSelector)
-            : base(input, output, devValueSelector)
+            : base(input, devValueSelector)
         {
         }
 
@@ -110,11 +97,11 @@ namespace ContinuousLinq.Aggregates
         {
             if (this.Input.Count > 0)
             {
-                _output.CurrentValue = StdDev.Compute(_selector, this.Input);
+                SetCurrentValue(StdDev.Compute(_selector, this.Input));
             }
             else
             {
-                _output.CurrentValue = default(double);
+                SetCurrentValueToDefault();
             }
         }
     }
@@ -122,16 +109,14 @@ namespace ContinuousLinq.Aggregates
     internal class ContinuousStdDevMonitorDecimal<T> : ContinuousStdDevMonitor<T, decimal> where T : INotifyPropertyChanged
     {
         public ContinuousStdDevMonitorDecimal(ObservableCollection<T> input,
-                                              ContinuousValue<double> output,
                                               Func<T, decimal> devValueSelector)
-            : base(input, output, devValueSelector)
+            : base(input, devValueSelector)
         {
         }
 
         public ContinuousStdDevMonitorDecimal(ReadOnlyObservableCollection<T> input,
-                                              ContinuousValue<double> output,
                                               Func<T, decimal> devValueSelector)
-            : base(input, output, devValueSelector)
+            : base(input, devValueSelector)
         {
         }
 
@@ -139,11 +124,11 @@ namespace ContinuousLinq.Aggregates
         {
             if (this.Input.Count > 0)
             {
-                _output.CurrentValue = StdDev.Compute(_selector, this.Input);
+                SetCurrentValue(StdDev.Compute(_selector, this.Input));
             }
             else
             {
-                _output.CurrentValue = default(double);
+                SetCurrentValueToDefault();
             }
         }
     }
@@ -151,28 +136,26 @@ namespace ContinuousLinq.Aggregates
     internal class ContinuousStdDevMonitorLong<T> : ContinuousStdDevMonitor<T, long> where T : INotifyPropertyChanged
     {
         public ContinuousStdDevMonitorLong(ObservableCollection<T> input,
-                                           ContinuousValue<double> output,
                                            Func<T, long> devValueSelector)
-            : base(input, output, devValueSelector)
+            : base(input, devValueSelector)
         {
         }
 
         public ContinuousStdDevMonitorLong(ReadOnlyObservableCollection<T> input,
-                                           ContinuousValue<double> output,
                                            Func<T, long> devValueSelector)
-            : base(input, output, devValueSelector)
+            : base(input, devValueSelector)
         {
         }
 
         protected override void ReAggregate()
         {
-            if (this.Input.Count > 0) 
+            if (this.Input.Count > 0)
             {
-                _output.CurrentValue = StdDev.Compute(_selector, this.Input);
+                SetCurrentValue(StdDev.Compute(_selector, this.Input));
             }
             else
             {
-                _output.CurrentValue = default(double);
+                SetCurrentValueToDefault();
             }
         }
     }

@@ -2,31 +2,32 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Collections.Specialized;
-using System;
 
 namespace ContinuousLinq.Aggregates
 {
-    public abstract class AggregateViewAdapter<T> where T : INotifyPropertyChanged
+    public abstract class AggregateViewAdapter<Tinput, Toutput> where Tinput : INotifyPropertyChanged
     {
-        private readonly InputCollectionWrapper<T> _input;
+        private readonly InputCollectionWrapper<Tinput> _input;
         private readonly NotifyCollectionChangedEventHandler _collectionChangedDelegate;
         private readonly PropertyChangedEventHandler _propertyChangedDelegate;
-        private readonly Dictionary<T, WeakPropertyChangedHandler> _handlerMap =
-            new Dictionary<T, WeakPropertyChangedHandler>();
+        private readonly Dictionary<Tinput, WeakPropertyChangedHandler> _handlerMap =
+            new Dictionary<Tinput, WeakPropertyChangedHandler>();
+        private readonly ContinuousValue<Toutput> _output = new ContinuousValue<Toutput>();
 
-        protected AggregateViewAdapter(ObservableCollection<T> input) :
-            this(new InputCollectionWrapper<T>(input))
+        protected AggregateViewAdapter(ObservableCollection<Tinput> input) :
+            this(new InputCollectionWrapper<Tinput>(input))
         {
         }
 
-        protected AggregateViewAdapter(ReadOnlyObservableCollection<T> input) :
-            this(new InputCollectionWrapper<T>(input))
+        protected AggregateViewAdapter(ReadOnlyObservableCollection<Tinput> input) :
+            this(new InputCollectionWrapper<Tinput>(input))
         {
         }
 
-        private AggregateViewAdapter(InputCollectionWrapper<T> input)
+        private AggregateViewAdapter(InputCollectionWrapper<Tinput> input)
         {
             _input = input;
+            _output.SourceAdapter = this;
 
             _collectionChangedDelegate =
                 delegate(object sender, NotifyCollectionChangedEventArgs args)
@@ -38,19 +39,19 @@ namespace ContinuousLinq.Aggregates
 
             new WeakCollectionChangedHandler(input.InnerAsNotifier, _collectionChangedDelegate);
 
-            foreach (T item in this.InputCollection)
+            foreach (Tinput item in this.InputCollection)
             {
                 SubscribeToItem(item);
             }
             // Subclasses must call ReAggregate here!!!
         }
 
-        protected IList<T> Input
+        protected IList<Tinput> Input
         {
             get { return _input.InnerAsList; }
         }
 
-        protected void SubscribeToItem(T item)
+        protected void SubscribeToItem(Tinput item)
         {
             if (_handlerMap.ContainsKey(item) == false)
             {
@@ -58,7 +59,7 @@ namespace ContinuousLinq.Aggregates
             }
         }
 
-        protected void UnsubscribeFromItem(T item)
+        protected void UnsubscribeFromItem(Tinput item)
         {
             WeakPropertyChangedHandler handler;
             if (_handlerMap.TryGetValue(item, out handler))
@@ -71,7 +72,7 @@ namespace ContinuousLinq.Aggregates
         /// <summary>
         /// A pointer to the collection to which this adapter is listening
         /// </summary>
-        protected IList<T> InputCollection
+        protected IList<Tinput> InputCollection
         {
             get { return _input.InnerAsList; }
         }
@@ -82,18 +83,18 @@ namespace ContinuousLinq.Aggregates
             switch (e.Action)
             {
                 case NotifyCollectionChangedAction.Remove:
-                    UnsubscribeFromItem((T)e.OldItems[0]);
+                    UnsubscribeFromItem((Tinput)e.OldItems[0]);
                     break;
                 case NotifyCollectionChangedAction.Add:
-                    SubscribeToItem((T)e.NewItems[0]);
+                    SubscribeToItem((Tinput)e.NewItems[0]);
                     break;
                 case NotifyCollectionChangedAction.Replace:
                 case NotifyCollectionChangedAction.Move:
-                    UnsubscribeFromItem((T)e.OldItems[0]);
-                    SubscribeToItem((T)e.NewItems[0]);
+                    UnsubscribeFromItem((Tinput)e.OldItems[0]);
+                    SubscribeToItem((Tinput)e.NewItems[0]);
                     break;
                 case NotifyCollectionChangedAction.Reset:
-                    foreach (T item in _input.InnerAsList)
+                    foreach (Tinput item in _input.InnerAsList)
                     {
                         UnsubscribeFromItem(item);
                     }
@@ -102,14 +103,19 @@ namespace ContinuousLinq.Aggregates
             ReAggregate();
         }
 
-        protected void SetCurrentValue<U>(ContinuousValue<U> cv, U newValue)
+        public ContinuousValue<Toutput> Value
         {
-            cv.CurrentValue = newValue;
+            get { return _output; }
         }
 
-        protected void SetSourceAdapter<U>(ContinuousValue<U> output, object adapter)
+        protected void SetCurrentValue(Toutput newvalue)
         {
-            output.SourceAdapter = adapter;
+            _output.CurrentValue = newvalue;
+        }
+
+        protected void SetCurrentValueToDefault()
+        {
+            _output.CurrentValue = default(Toutput);
         }
 
         protected abstract void ReAggregate();

@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using ContinuousLinq.Aggregates;
 using System.ComponentModel;
 using System.Collections.ObjectModel;
@@ -15,27 +12,20 @@ namespace StockMonitorDemo.Extensions
             Func<T, double> priceSelector,
             Func<T, int> quantitySelector) where T: INotifyPropertyChanged
         {
-            ContinuousValue<double> output = new ContinuousValue<double>();
-            ContinuousVwapMonitor<T> vwapMonitor =
-                new ContinuousVwapMonitor<T>(input, priceSelector, quantitySelector, output);
-            return output;
+            return new ContinuousVwapMonitor<T>(input, priceSelector, quantitySelector).Value;
         }
     }
 
-    public class ContinuousVwapMonitor<T> : AggregateViewAdapter<T> where T:INotifyPropertyChanged
+    internal class ContinuousVwapMonitor<T> : AggregateViewAdapter<T, double> where T:INotifyPropertyChanged
     {
-        private ContinuousValue<double> _output;
-        private Func<T, double> _priceSelector;
-        private Func<T, int> _qtySelector;
+        private readonly Func<T, double> _priceSelector;
+        private readonly Func<T, int> _qtySelector;
 
         public ContinuousVwapMonitor(ObservableCollection<T> input,
             Func<T, double> priceSelector,
-            Func<T, int> quantitySelector,
-            ContinuousValue<double> output)
+            Func<T, int> quantitySelector)
             : base(input)
         {
-            _output = output;
-            SetSourceAdapter(_output, this);
             _priceSelector = priceSelector;
             _qtySelector = quantitySelector;
             ReAggregate();
@@ -55,7 +45,7 @@ namespace StockMonitorDemo.Extensions
             }
 
             double vwap = weightedPrice / totalQuantity;
-            SetCurrentValue<double>(_output, vwap);
+            SetCurrentValue(vwap);
         }
     }
 }
