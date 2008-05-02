@@ -43,14 +43,14 @@
     </Window.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="0.6*"/>
             <ColumnDefinition Width="0.4*"/>
+            <ColumnDefinition Width="0.6*"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         
-        <Grid x:Name="priceBookGrid" Grid.Row="0" Grid.Column="0" ShowGridLines="True">
+        <Grid x:Name="priceBookGrid" Grid.Row="0" Grid.Column="1" >
             <Grid.Background>
                 <LinearGradientBrush StartPoint="0.499169,0.00124688" EndPoint="0.499169,1.00042">
                     <GradientStop Color="AliceBlue" Offset="0"/>
@@ -66,8 +66,8 @@
                 <RowDefinition Height="30"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
-            
-            <Rectangle Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="3">
+                       
+            <Rectangle Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="3" Stroke="Transparent">
                 <Rectangle.Fill>
                     <LinearGradientBrush StartPoint="0.499169,0.00124688" EndPoint="0.499169,1.00042">
                         <GradientStop Color="LightGreen" Offset="0"/>
@@ -82,12 +82,12 @@
             
             <ListBox x:Name="bidList" Grid.Row="1" Grid.Column="0" 
                      ItemsSource="{Binding BidTicks}"
-                     ItemTemplate="{StaticResource QuoteListItem}">            
+                     ItemTemplate="{StaticResource QuoteListItem}" BorderBrush="White">            
             </ListBox>
             
             <ListBox x:Name="askList" Grid.Row="1" Grid.Column="1" 
                      ItemsSource="{Binding AskTicks}"
-                     ItemTemplate="{StaticResource QuoteListItem}">            
+                     ItemTemplate="{StaticResource QuoteListItem}" BorderBrush="White">            
             </ListBox>
             
             <ListBox x:Name="priceList" Grid.Row="1" Grid.Column="2" Background="Transparent"
@@ -99,26 +99,16 @@
 
         </Grid>
 
-        <Grid Grid.Row="0" Grid.Column="1">
+        <Grid Grid.Row="0" Grid.Column="0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
-                <RowDefinition Height="0.6*"/>
-                <RowDefinition Height="0.1*"/>
-                <RowDefinition Height="0.3*"/>
+                <RowDefinition Height="30*"/>
+                <RowDefinition Height="293*"/>                
+                <RowDefinition Height="139*"/>
             </Grid.RowDefinitions>
-            
-            <TextBlock Grid.Row="1" Text="{Binding MonitoredSymbol}" FontFamily="Segoe UI" FontSize="32" FontWeight="Bold" Foreground="White" Margin="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" TextAlignment="Center">
-                <TextBlock.Background>
-                     <LinearGradientBrush StartPoint="0.499169,0.00124688" EndPoint="0.499169,1.00042">
-                        <GradientStop Color="LightGreen" Offset="0"/>
-                        <GradientStop Color="Green" Offset="1"/>
-                    </LinearGradientBrush>
-                </TextBlock.Background>
-            </TextBlock>
-            
-            <Border Grid.Row="0" Grid.Column="1" Background="Black">
+            <Border Grid.Row="1" Grid.Column="1" Background="Black">
                 <Canvas x:Name="gridCanvas" Background="{StaticResource gridBackgroundBrush}" Width="300" Height="270">
                     <Polyline x:Name="priceLine" Stroke="Yellow" StrokeThickness="1" Points="{Binding Path=GraphWindowTicks, Converter={StaticResource TickCollectionFormatter}}" Canvas.Top="0" Canvas.Left="0"/>
                     <Polyline x:Name="vwapLine" Stroke="White" StrokeThickness="1" Points="{Binding Path=VwapTicks, Converter={StaticResource TickCollectionFormatter}}" Canvas.Top="0" Canvas.Left="0"/>
@@ -138,6 +128,27 @@
                     <TextBlock Text="VWAP:" FontFamily="Segoe UI" FontSize="12" Padding="5,5,5,5" FontWeight="Bold"/>    
                     <TextBlock Text="{Binding LiveVwap.CurrentValue, Converter={StaticResource PriceFormatter}}" FontFamily="SegoeUI" FontSize="12" Padding="5,5,5,5" FontWeight="Bold"/>                    
                 </StackPanel>                                
+            </StackPanel>
+            
+            <StackPanel Grid.Row="0" Grid.Column="0">
+                <StackPanel.Background>
+                    <LinearGradientBrush StartPoint="0.499169,0.00124688" EndPoint="0.499169,1.00042">
+                        <GradientStop Color="LightGreen" Offset="0" />
+                        <GradientStop Color="Green" Offset="1" />
+                    </LinearGradientBrush>
+                </StackPanel.Background>
+                <TextBlock Grid.Row="0" Text="{Binding MonitoredSymbol}" 
+                           FontFamily="Segoe UI" 
+                           FontSize="20" 
+                           FontWeight="Bold" 
+                           Foreground="White"                            
+                            FontStretch="ExtraExpanded"
+                           TextAlignment="Center"
+                           HorizontalAlignment="Center" Width="309" Height="28">
+                    <!--<TextBlock.RenderTransform>
+                        <ScaleTransform ScaleX="3" CenterX="155.5" CenterY="15" />
+                    </TextBlock.RenderTransform>-->
+                </TextBlock>
             </StackPanel>
         </Grid>
 
