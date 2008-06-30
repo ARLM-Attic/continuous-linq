@@ -285,6 +285,73 @@ namespace ContinuousLinq
         }
         #endregion
 
+        #region Distinct
+        /// <summary>
+        /// Private static method for Distinct operating using the 
+        /// default IEqualityComparer of T.
+        /// </summary>
+        /// <typeparam name="TSource"></typeparam>
+        /// <param name="source"></param>
+        /// <returns></returns>
+        private static ReadOnlyContinuousCollection<TSource> Distinct<TSource>(
+            InputCollectionWrapper<TSource> source)
+            where TSource : INotifyPropertyChanged
+        {
+            LinqContinuousCollection<TSource> output = new LinqContinuousCollection<TSource>();
+            new DistinctViewAdapter<TSource>(source, output);
+
+            return output;
+        }
+
+        private static ReadOnlyContinuousCollection<TSource> Distinct<TSource>(
+            InputCollectionWrapper<TSource> source,
+            IEqualityComparer<TSource> comparer)
+            where TSource:  INotifyPropertyChanged
+        {
+            LinqContinuousCollection<TSource> output = new LinqContinuousCollection<TSource>();
+            new DistinctViewAdapter<TSource>(source, output, comparer);
+
+            return output;
+        }
+
+        /// <summary>
+        /// Public static method for Distinct extension using default
+        /// IEqualityComparer of T.
+        /// </summary>
+        /// <typeparam name="TSource"></typeparam>
+        /// <param name="source"></param>
+        /// <returns></returns>
+        public static ReadOnlyContinuousCollection<TSource> Distinct<TSource>(
+            this ObservableCollection<TSource> source)
+            where TSource : INotifyPropertyChanged
+        {
+            return Distinct(new InputCollectionWrapper<TSource>(source));
+        }
+
+        /// <summary>
+        /// Public static method for Distinct extension using default
+        /// IEqualityComparer of T.
+        /// </summary>
+        /// <typeparam name="TSource"></typeparam>
+        /// <param name="source"></param>
+        /// <returns></returns>
+        public static ReadOnlyContinuousCollection<TSource> Distinct<TSource>(
+            this ReadOnlyObservableCollection<TSource> source,
+            IEqualityComparer<TSource> comparer)
+            where TSource : INotifyPropertyChanged
+        {
+            return Distinct(new InputCollectionWrapper<TSource>(source), comparer);
+        }
+
+        public static ReadOnlyContinuousCollection<TSource> Distinct<TSource>(
+            this ObservableCollection<TSource> source,
+            IEqualityComparer<TSource> comparer)
+            where TSource : INotifyPropertyChanged
+        {
+            return Distinct(new InputCollectionWrapper<TSource>(source), comparer);
+        }
+        #endregion
+
         #region Helpers
 
         /// <summary>

@@ -65,6 +65,7 @@
     <Compile Include="Aggregates\StdDev.cs" />
     <Compile Include="Aggregates\ContinuousStdDevMonitor.cs" />
     <Compile Include="ContinuousQueryExtension.cs" />
+    <Compile Include="DistinctViewAdapter.cs" />
     <Compile Include="LinqContinuousCollection.cs" />
     <Compile Include="OutputCollectionWrapper.cs" />
     <Compile Include="ReadOnlyContinuousCollection.cs" />

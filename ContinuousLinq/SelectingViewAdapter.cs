@@ -32,8 +32,7 @@ namespace ContinuousLinq
         }
 
         protected override void OnCollectionItemPropertyChanged(TSource item, string propertyName)
-        {
-            // Damn, no index.
+        {            
             IList<TSource> list = this.InputCollection;
             int index = list.IndexOf(item);
             this.OutputCollection[index] = _func(list[index]);
