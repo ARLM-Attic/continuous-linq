@@ -1,58 +1,87 @@
-﻿using System.Collections.Generic;
+﻿using System;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
+using System.Windows;
 
 namespace ContinuousLinq
 {
-    internal sealed class ExceptViewAdapter<TSource> : ViewAdapter<TSource, TSource>
-       where TSource : INotifyPropertyChanged
+    internal sealed class ExceptViewAdapter<T> : IViewAdapter, IWeakEventListener       
     {
-        private IEqualityComparer<TSource> _comparer = null;
+        #region Constructor
 
-        public ExceptViewAdapter(InputCollectionWrapper<TSource> source, LinqContinuousCollection<TSource> output)
-            : base(source, output)
+        public ExceptViewAdapter(InputCollectionWrapper<T> input1, InputCollectionWrapper<T> input2, LinqContinuousCollection<T> output)
         {
+            if (input1 == null)
+                throw new ArgumentNullException("input1");
+            if (input2 == null)
+                throw new ArgumentNullException("input2");
+            if (output == null)
+                throw new ArgumentNullException("output");
+
+            this.Input1 = input1;
+            this.Input2 = input2;
+            this.Output = new OutputCollectionWrapper<T>(output);
+
+            // Backreference
+            output.SourceAdapter = this;
+
+            // Subscribe to collection / property change
+            CollectionChangedEventManager.AddListener(input1.InnerAsNotifier, this);
+            CollectionChangedEventManager.AddListener(input2.InnerAsNotifier, this);
+           
+            // Evaluate changes
             ReEvaluate();
         }
 
-        public ExceptViewAdapter(InputCollectionWrapper<TSource> source, LinqContinuousCollection<TSource> output,
-            IEqualityComparer<TSource> comparer)
-            : base(source, output)
+        #endregion
+
+        #region Properties
+
+        private InputCollectionWrapper<T> Input1 { get; set; }
+        
+        private InputCollectionWrapper<T> Input2 { get; set; }
+
+        private OutputCollectionWrapper<T> Output { get; set; }
+
+        public IViewAdapter PreviousAdapter
         {
-            _comparer = comparer;
-            ReEvaluate();
+            get { return this.Input1.SourceAdapter; }
         }
 
-        protected override void AddItem(TSource newItem, int index)
-        {            
-            ReEvaluate();
+        #endregion
+
+        #region Methods
+
+        public void ReEvaluate()
+        {
+            this.Output.Clear();
+            this.Output.AddRange(this.Input1.InnerAsList.Except(this.Input2.InnerAsList));    
         }
 
-        protected override void Clear()
+        public bool ReceiveWeakEvent(Type managerType, object sender, EventArgs e)
         {
-            this.OutputCollection.Clear();
+            if (managerType != typeof(CollectionChangedEventManager))
+                return false;
+
+            OnCollectionChanged(sender, (NotifyCollectionChangedEventArgs)e);
+            return true;
         }
 
-        protected override void OnCollectionItemPropertyChanged(TSource item, string propertyName)
+        private void OnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            ReEvaluate();
+            switch (e.Action)
+            {
+                case NotifyCollectionChangedAction.Add:                                 
+                case NotifyCollectionChangedAction.Remove:
+                    ReEvaluate();
+                    break;
+                case NotifyCollectionChangedAction.Reset:
+                    this.Output.Clear();                    
+                    break;
+            }
         }
 
-        protected override void OnInputCollectionChanged(NotifyCollectionChangedEventArgs e)
-        {
-            base.OnInputCollectionChanged(e);
-            ReEvaluate();
-        }
-
-        protected override bool RemoveItem(TSource newItem, int index)
-        {
-            return this.OutputCollection.Remove(newItem);
-        }
-
-        public override void ReEvaluate()
-        {
-            // TODO            
-        }
+        #endregion
     }
 }

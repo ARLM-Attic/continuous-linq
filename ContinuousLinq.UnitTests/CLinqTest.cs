@@ -183,14 +183,72 @@ namespace ContinuousLinq.UnitTests
         }
 
         [Test]
-        [Ignore("Not Implemented")]
-        public void ContinuousExcept_OfTwoCollections_ReturnsCollectionOfValuesInFirstCollection()
+        public void Except_OfTwoCollections_ReturnsValuesOnlyInFirstCollection()
         {
             var numbersA = CreateCollection(0, 2, 4, 5, 6, 8, 9);
             var numbersB = CreateCollection(1, 3, 5, 7, 8);
 
             var numbersExcept = numbersA.Except(numbersB);
+
+            Assert.IsTrue(numbersExcept.SequenceEqual(CreateCollection(0, 2, 4, 6, 9)));
+        }
+
+        [Test]
+        public void Except_AddNumberToSecondCollection_ReturnsValuesOnlyInFirstCollection()
+        {
+            var numbersA = CreateCollection(0, 2, 4, 5, 6, 8, 9);
+            var numbersB = CreateCollection(1, 3, 5, 7, 8);            
+
+            var numbersExcept = numbersA.Except(numbersB);
+            Assert.AreEqual(5, numbersExcept.Count());
+
+            numbersB.Add(0);
+            Assert.IsTrue(numbersExcept.SequenceEqual(CreateCollection(2, 4, 6, 9)));
+        }
+
+        [Test]
+        public void Except_RemoveNumberFromSecondCollection_ReturnsValuesOnlyInFirstCollection()
+        {
+            var numbersA = CreateCollection(0, 2, 4, 5, 6, 8, 9);
+            var numbersB = CreateCollection(1, 3, 5, 7, 8);
+
+            var numbersExcept = numbersA.Except(numbersB);
+            Assert.AreEqual(5, numbersExcept.Count());
+
+            numbersB.Remove(8);
+            Assert.IsTrue(numbersExcept.SequenceEqual(CreateCollection(0, 2, 4, 6, 8, 9)));
+        }
+
+        [Test]
+        public void Except_AddNumberToFirstCollection_ReturnsValuesOnlyInFirstCollection()
+        {
+            var numbersA = CreateCollection(0, 2, 4, 5, 6, 8, 9);
+            var numbersB = CreateCollection(1, 3, 5, 7, 8);
+
+            var numbersExcept = numbersA.Except(numbersB);
+            Assert.AreEqual(5, numbersExcept.Count());
+
+            numbersA.Add(3);
+            Assert.IsTrue(numbersExcept.SequenceEqual(CreateCollection(0, 2, 4, 6, 9)));
             
+            numbersA.Add(10);
+            Assert.IsTrue(numbersExcept.SequenceEqual(CreateCollection(0, 2, 4, 6, 9, 10)));
+        }
+
+        [Test]
+        public void Except_RemoveNumberFromFirstCollection_ReturnsValuesOnlyInFirstCollection()
+        {
+            var numbersA = CreateCollection(0, 2, 4, 5, 6, 8, 9);
+            var numbersB = CreateCollection(1, 3, 5, 7, 8);
+
+            var numbersExcept = numbersA.Except(numbersB);
+            Assert.AreEqual(5, numbersExcept.Count());
+
+            numbersA.Remove(2);
+            Assert.IsTrue(numbersExcept.SequenceEqual(CreateCollection(0, 4, 6, 9)));
+
+            numbersA.Remove(8);
+            Assert.IsTrue(numbersExcept.SequenceEqual(CreateCollection(0, 4, 6, 9)));
         }
 
         [Test]
@@ -210,7 +268,7 @@ namespace ContinuousLinq.UnitTests
             Assert.IsFalse(weakReference.IsAlive);
         }
 
-        private ContinuousCollection<int> CreateCollection(params int[] numbers)
+        private static ContinuousCollection<int> CreateCollection(params int[] numbers)
         {
             return new ContinuousCollection<int>(new List<int>(numbers));
         }

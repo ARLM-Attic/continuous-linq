@@ -368,30 +368,41 @@ namespace ContinuousLinq
         #region Except        
         
         private static ReadOnlyContinuousCollection<TSource> Except<TSource>(
-            InputCollectionWrapper<TSource> source,
-            InputCollectionWrapper<TSource> second)
-            where TSource : INotifyPropertyChanged
+            InputCollectionWrapper<TSource> input1,
+            InputCollectionWrapper<TSource> input2)            
         {
             var output = new LinqContinuousCollection<TSource>();
-            // new ExceptViewAdapter<TSource>(source, second, output);
+            new ExceptViewAdapter<TSource>(input1, input2, output);
             return output;
         }  
 
         public static ReadOnlyContinuousCollection<TSource> Except<TSource>(
-            this ObservableCollection<TSource> input,
-            ReadOnlyObservableCollection<TSource> second)
-            where TSource : INotifyPropertyChanged
+            this ObservableCollection<TSource> input1,
+            ReadOnlyObservableCollection<TSource> input2)            
         {
-            return Except(new InputCollectionWrapper<TSource>(input), new InputCollectionWrapper<TSource>(second));
+            return Except(new InputCollectionWrapper<TSource>(input1), new InputCollectionWrapper<TSource>(input2));
         }
 
         public static ReadOnlyContinuousCollection<TSource> Except<TSource>(
-            this ReadOnlyObservableCollection<TSource> input,
-            ReadOnlyObservableCollection<TSource> second)
-            where TSource : INotifyPropertyChanged
+            this ReadOnlyObservableCollection<TSource> input1,
+            ReadOnlyObservableCollection<TSource> input2)            
         {
-            return Except(new InputCollectionWrapper<TSource>(input), new InputCollectionWrapper<TSource>(second));
-        }        
+            return Except(new InputCollectionWrapper<TSource>(input1), new InputCollectionWrapper<TSource>(input2));
+        }
+
+        public static ReadOnlyContinuousCollection<TSource> Except<TSource>(
+            this ObservableCollection<TSource> input1,
+            ObservableCollection<TSource> input2)            
+        {
+            return Except(new InputCollectionWrapper<TSource>(input1), new InputCollectionWrapper<TSource>(input2));
+        }
+
+        public static ReadOnlyContinuousCollection<TSource> Except<TSource>(
+            this ReadOnlyObservableCollection<TSource> input1,
+            ObservableCollection<TSource> input2)            
+        {
+            return Except(new InputCollectionWrapper<TSource>(input1), new InputCollectionWrapper<TSource>(input2));
+        }
 
         #endregion
 
