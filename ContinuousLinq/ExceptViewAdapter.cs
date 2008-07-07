@@ -1,23 +1,22 @@
-﻿using System.Collections.Specialized;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.ComponentModel;
+using System.Linq;
 
 namespace ContinuousLinq
-{   
-    internal sealed class DistinctViewAdapter<TSource> : ViewAdapter<TSource, TSource>
-        where TSource : INotifyPropertyChanged
+{
+    internal sealed class ExceptViewAdapter<TSource> : ViewAdapter<TSource, TSource>
+       where TSource : INotifyPropertyChanged
     {
         private IEqualityComparer<TSource> _comparer = null;
 
-        public DistinctViewAdapter(InputCollectionWrapper<TSource> source,
-            LinqContinuousCollection<TSource> output) : base(source, output)
+        public ExceptViewAdapter(InputCollectionWrapper<TSource> source, LinqContinuousCollection<TSource> output)
+            : base(source, output)
         {
             ReEvaluate();
         }
 
-        public DistinctViewAdapter(InputCollectionWrapper<TSource> source,
-            LinqContinuousCollection<TSource> output,
+        public ExceptViewAdapter(InputCollectionWrapper<TSource> source, LinqContinuousCollection<TSource> output,
             IEqualityComparer<TSource> comparer)
             : base(source, output)
         {
@@ -49,19 +48,11 @@ namespace ContinuousLinq
         protected override bool RemoveItem(TSource newItem, int index)
         {
             return this.OutputCollection.Remove(newItem);
-        }                  
+        }
 
         public override void ReEvaluate()
-        {            
-            this.OutputCollection.Clear();
-            IEnumerable<TSource> distinctItems;
-
-            if (_comparer != null)
-                distinctItems = InputCollection.Distinct<TSource>(_comparer);
-            else
-                distinctItems = InputCollection.Distinct<TSource>();
-
-            this.OutputCollection.AddRange(distinctItems);
-        }        
+        {
+            // TODO            
+        }
     }
 }

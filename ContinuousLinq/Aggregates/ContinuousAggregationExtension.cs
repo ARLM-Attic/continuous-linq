@@ -99,7 +99,7 @@ namespace ContinuousLinq.Aggregates
             return new ContinuousCountMonitor<T>(input).Value;
         }
 
-        #endregion
+        #endregion       
 
         #region MIN
 

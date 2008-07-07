@@ -365,6 +365,36 @@ namespace ContinuousLinq
         }
         #endregion
 
+        #region Except        
+        
+        private static ReadOnlyContinuousCollection<TSource> Except<TSource>(
+            InputCollectionWrapper<TSource> source,
+            InputCollectionWrapper<TSource> second)
+            where TSource : INotifyPropertyChanged
+        {
+            var output = new LinqContinuousCollection<TSource>();
+            // new ExceptViewAdapter<TSource>(source, second, output);
+            return output;
+        }  
+
+        public static ReadOnlyContinuousCollection<TSource> Except<TSource>(
+            this ObservableCollection<TSource> input,
+            ReadOnlyObservableCollection<TSource> second)
+            where TSource : INotifyPropertyChanged
+        {
+            return Except(new InputCollectionWrapper<TSource>(input), new InputCollectionWrapper<TSource>(second));
+        }
+
+        public static ReadOnlyContinuousCollection<TSource> Except<TSource>(
+            this ReadOnlyObservableCollection<TSource> input,
+            ReadOnlyObservableCollection<TSource> second)
+            where TSource : INotifyPropertyChanged
+        {
+            return Except(new InputCollectionWrapper<TSource>(input), new InputCollectionWrapper<TSource>(second));
+        }        
+
+        #endregion
+
         #region Helpers
 
         /// <summary>

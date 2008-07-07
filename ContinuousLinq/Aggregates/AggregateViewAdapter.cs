@@ -78,8 +78,7 @@ namespace ContinuousLinq.Aggregates
         }
 
         void OnInputCollectionChanged(NotifyCollectionChangedEventArgs e)
-        {
-            //Console.WriteLine("[AVA] Input changed...");
+        {            
             switch (e.Action)
             {
                 case NotifyCollectionChangedAction.Remove:

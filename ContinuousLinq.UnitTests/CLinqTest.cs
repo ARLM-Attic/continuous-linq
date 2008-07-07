@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
@@ -182,6 +183,17 @@ namespace ContinuousLinq.UnitTests
         }
 
         [Test]
+        [Ignore("Not Implemented")]
+        public void ContinuousExcept_OfTwoCollections_ReturnsCollectionOfValuesInFirstCollection()
+        {
+            var numbersA = CreateCollection(0, 2, 4, 5, 6, 8, 9);
+            var numbersB = CreateCollection(1, 3, 5, 7, 8);
+
+            var numbersExcept = numbersA.Except(numbersB);
+            
+        }
+
+        [Test]
         public void DropReference_Always_GarbageCollectsResultCollection()
         {
             var ageCollection = from item in _source
@@ -196,6 +208,11 @@ namespace ContinuousLinq.UnitTests
 
             GC.Collect();
             Assert.IsFalse(weakReference.IsAlive);
+        }
+
+        private ContinuousCollection<int> CreateCollection(params int[] numbers)
+        {
+            return new ContinuousCollection<int>(new List<int>(numbers));
         }
 
         private void AddItemsToSource()
