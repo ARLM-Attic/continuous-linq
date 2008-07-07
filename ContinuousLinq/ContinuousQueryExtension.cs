@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Diagnostics;
 
 namespace ContinuousLinq
 {
@@ -347,6 +346,7 @@ namespace ContinuousLinq
         /// </summary>
         /// <typeparam name="TSource"></typeparam>
         /// <param name="source"></param>
+        /// <param name="comparer"></param>
         /// <returns></returns>
         public static ReadOnlyContinuousCollection<TSource> Distinct<TSource>(
             this ReadOnlyObservableCollection<TSource> source,
