@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
 using ContinuousLinq;
+using ContinuousLinq.Aggregates;
 using NUnit.Framework;
-using System.ComponentModel;
 
 namespace ContinuousLinq.UnitTests
 {
@@ -29,7 +30,7 @@ namespace ContinuousLinq.UnitTests
         }
 
         [Test]
-        public void TestFilteringViewAdapter()
+        public void FilteringViewAdapter_OnAgeGreaterThan30_ReturnsCollectionWithPersonsOlderThan30()
         {           
             _target = from item in _source
                       where item.Age > 30
@@ -50,7 +51,7 @@ namespace ContinuousLinq.UnitTests
         }
 
         [Test]
-        public void TestSortingViewAdapater()
+        public void SortingViewAdapater_ByName_ReturnsCollectionOrderedAscendingByName()
         {
             _target = from item in _source
                       orderby item.Name
@@ -67,7 +68,7 @@ namespace ContinuousLinq.UnitTests
         }
 
         [Test]
-        public void TestGroupingViewAdapter()
+        public void GroupingViewAdapter_ByAge_ReturnsPersonsGroupedByAge()
         {
             var personGroups = from item in _source
                                group item by item.Age into g
@@ -90,7 +91,7 @@ namespace ContinuousLinq.UnitTests
         }
         
         [Test]
-        public void TestSelectingViewAdapter()
+        public void SelectingViewAdapter_ByAge_ReturnsCollectionOfAges()
         {
             var ageCollection = from item in _source
                                 select item.Age;
@@ -132,9 +133,9 @@ namespace ContinuousLinq.UnitTests
         }
 
         [Test]
-        public void TestSelectingViewAdapterSupportsReadOnlyObservableCollection()
+        public void SelectingViewAdapter_Always_SupportsReadOnlyObservableCollection()
         {
-            ReadOnlyObservableCollection<Person> readOnlySource = new ReadOnlyObservableCollection<Person>(_source);
+            var readOnlySource = new ReadOnlyObservableCollection<Person>(_source);
             var ageCollection = from item in readOnlySource
                                 select item.Age;
 
@@ -150,7 +151,38 @@ namespace ContinuousLinq.UnitTests
         }
 
         [Test]
-        public void TestResultIsCollectedAfterReferenceIsDropped()
+        public void ContinuousSum_ByAge_SumsAge()
+        {
+            var readOnlySource = new ReadOnlyObservableCollection<Person>(_source);
+            var sumOfAge = readOnlySource.Sum(x => x.Age);            
+            var continuousSum = readOnlySource.ContinuousSum(x => x.Age);
+            Assert.AreEqual(sumOfAge, continuousSum.CurrentValue);
+
+            _source.Add(new Person("Peter", 12));
+            Assert.AreEqual(sumOfAge + 12, continuousSum.CurrentValue);
+        }
+
+        [Test]
+        public void ContinuousCount_OfAgeGreaterThan30_ReturnsCountOfPersonGreaterThan30()
+        {
+            var readOnlySource = new ReadOnlyObservableCollection<Person>(_source);
+            var overThirty = (from item in readOnlySource
+                             where item.Age > 30
+                             select item).Count();
+
+
+            var continuousOverThirty = (from item in readOnlySource
+                                        where item.Age > 30
+                                        select item).ContinuousCount();
+
+            Assert.AreEqual(overThirty, continuousOverThirty.CurrentValue);
+
+            _source.Add(new Person("Peter", 34));
+            Assert.AreEqual(overThirty + 1, continuousOverThirty.CurrentValue);
+        }
+
+        [Test]
+        public void DropReference_Always_GarbageCollectsResultCollection()
         {
             var ageCollection = from item in _source
                                 select item.Age;
@@ -158,7 +190,7 @@ namespace ContinuousLinq.UnitTests
             // LINQ execution is deferred.  This will execute query.
             int count = ageCollection.Count();
 
-            WeakReference weakReference = new WeakReference(ageCollection);
+            var weakReference = new WeakReference(ageCollection);
             Assert.IsTrue(weakReference.IsAlive);
             ageCollection = null;
 
