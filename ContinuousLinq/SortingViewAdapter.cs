@@ -45,8 +45,7 @@ namespace ContinuousLinq
         }
 
         private void FullSort()
-        {
-            Trace.WriteLine("[SVA] Full sort.");
+        {            
             List<TSource> sortedList = new List<TSource>(this.InputCollection);
             sortedList.Sort(_compareFunc);
 
@@ -55,8 +54,7 @@ namespace ContinuousLinq
         }
 
         protected override void OnCollectionItemPropertyChanged(TSource item, string propertyName)
-        {
-            Trace.WriteLine("[SVA] Property Changed : " + propertyName);
+        {            
             // Short circuit the darn thing if we are a chained orderby.
             // Last sorter in line will do the sorting.
             if (_isLastInChain)
@@ -80,21 +78,17 @@ namespace ContinuousLinq
             {
                 index = ~index;
             }
-
-            Trace.WriteLine("[SVA] New Item (" + item + ") inserted @ index " + index);
+            
             this.OutputCollection.Insert(index, item);
         }
 
         protected override bool RemoveItem(TSource deleteItem, int index)
         {
-            Trace.WriteLine("\t[SVA] Source Deleted Item: " + deleteItem);
-            bool hadIt = this.OutputCollection.Remove(deleteItem);
-            return hadIt;
+            return this.OutputCollection.Remove(deleteItem);            
         }
 
         protected override void AddItem(TSource newItem, int index)
-        {
-            Trace.WriteLine("\t[SVA] Source Added Item: " + newItem);
+        {            
             // Short circuit the darn thing if we are a chained orderby.
             // Last sorter in line will do the sorting.
             if (_isLastInChain)

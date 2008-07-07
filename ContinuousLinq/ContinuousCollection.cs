@@ -180,8 +180,7 @@ namespace ContinuousLinq
         /// <param name="index">Index of item being inserted</param>
         /// <param name="item">Item being inserted</param>
         protected override void InsertItem(int index, T item)
-        {
-            //Trace.WriteLine("***** INSERT!!!! ****");
+        {         
             if (NoInvoke())
             {
                 AddOrRemovePropertyListener(item, true);

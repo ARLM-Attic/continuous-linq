@@ -20,8 +20,7 @@ namespace ContinuousLinq
         public FilteringViewAdapter(InputCollectionWrapper<T> input,
             LinqContinuousCollection<T> output,
             Func<T, bool> predicateFunc) : base(input, output)
-        {
-            Trace.WriteLine("[FVA] Init.");
+        {            
             _predicate = predicateFunc;
 
             foreach (T item in this.InputCollection)
@@ -40,8 +39,7 @@ namespace ContinuousLinq
         /// <param name="item"></param>
         /// <param name="propertyName"></param>
         protected override void OnCollectionItemPropertyChanged(T item, string propertyName)
-        {
-            Trace.WriteLine("[FVA] (" + item + ") Property Changed : " + propertyName);
+        {            
             Filter(item);
         }
 
