@@ -67,6 +67,7 @@
     <Compile Include="ContinuousQueryExtension.cs" />
     <Compile Include="DistinctViewAdapter.cs" />
     <Compile Include="ExceptViewAdapter.cs" />
+    <Compile Include="ExpressionPropertyAnalyzer.cs" />
     <Compile Include="LinqContinuousCollection.cs" />
     <Compile Include="OutputCollectionWrapper.cs" />
     <Compile Include="ReadOnlyContinuousCollection.cs" />
@@ -79,6 +80,8 @@
     <Compile Include="GroupingViewAdapter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ContinuousCollection.cs" />
+    <Compile Include="SmartFilterAdapter.cs" />
+    <Compile Include="SmartViewAdapter.cs" />
     <Compile Include="SortingViewAdapter.cs" />
     <Compile Include="ViewAdapter.cs" />
     <Compile Include="WeakEventHandlers.cs" />

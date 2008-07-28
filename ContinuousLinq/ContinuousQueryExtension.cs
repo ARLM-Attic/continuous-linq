@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Windows;
+using System.Linq.Expressions;
 
 namespace ContinuousLinq
 {
@@ -35,7 +37,16 @@ namespace ContinuousLinq
         {
             return Where(new InputCollectionWrapper<T>(source), filterFunc);
         }
-        
+
+        public static ReadOnlyContinuousCollection<T> Where<T>(
+            this ObservableCollection<T> source,
+            Expression<Func<T, bool>> filterExpr) where T : INotifyPropertyChanged
+        {
+            LinqContinuousCollection<T> output = new LinqContinuousCollection<T>();
+            new SmartFilterAdapter<T>(new InputCollectionWrapper<T>(source), 
+                output, filterExpr);
+            return output;
+        }
         #endregion
 
         #region OrderBy
