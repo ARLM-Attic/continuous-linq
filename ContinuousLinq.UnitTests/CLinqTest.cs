@@ -52,6 +52,33 @@ namespace ContinuousLinq.UnitTests
         }
 
         [Test]
+        [Ignore("This isn't working because CollectionItemChanged doesn't fire for some reason.")]
+        public void SmartFilterAdapter_OnAgeGreaterThan30_OnlyFiltersWhenTargetdPropertyChanges()
+        {
+            _source.Add(new Person("John", 12));
+            _source.Add(new Person("Tim", 34));
+
+            _target = from item in _source
+                      where item.Age > 30
+                      select item;
+            
+            bool wasCalled = false;
+            
+            _target.CollectionItemChanged += (sender, args) =>
+            {
+                wasCalled = true;
+            };
+
+            Assert.IsFalse(wasCalled);
+            
+            _source[0].Name = "Bob";
+            Assert.IsFalse(wasCalled);
+
+            _source[1].Age = 31;
+            Assert.IsTrue(wasCalled);
+        }
+
+        [Test]
         public void SortingViewAdapater_ByName_ReturnsCollectionOrderedAscendingByName()
         {
             _target = from item in _source
@@ -284,50 +311,5 @@ namespace ContinuousLinq.UnitTests
 
             Assert.AreEqual(6, _source.Count);
         }
-
-        #region Person Class
-
-        public class Person : INotifyPropertyChanged
-        {
-            private readonly string _name;
-            private readonly int _age;
-
-            public event PropertyChangedEventHandler PropertyChanged;
-
-            public Person(string name, int age)
-            {
-                _name = name;
-                _age = age;
-            }
-
-            public string Name
-            {
-                get { return _name; }
-            }
-
-            public int Age
-            {
-                get { return _age; }
-            }
-
-            #region Members                        
-
-            public override int GetHashCode()
-            {
-                return (this.Name.GetHashCode() ^ this.Age.GetHashCode());
-            }
-
-            private void OnPropertyChanged(string property)
-            {
-                if (this.PropertyChanged == null)
-                    return;
-
-                this.PropertyChanged(this, new PropertyChangedEventArgs(property));
-            }
-
-            #endregion           
-        }
-
-        #endregion
     }
 }

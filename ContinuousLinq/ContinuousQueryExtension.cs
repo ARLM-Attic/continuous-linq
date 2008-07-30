@@ -26,11 +26,11 @@ namespace ContinuousLinq
             return output;            
         }
 
-        public static ReadOnlyContinuousCollection<T> Where<T>(
-            this ObservableCollection<T> source, Func<T, bool> filterFunc) where T : INotifyPropertyChanged
-        {
-            return Where(new InputCollectionWrapper<T>(source), filterFunc);            
-        }
+        //public static ReadOnlyContinuousCollection<T> Where<T>(
+        //    this ObservableCollection<T> source, Func<T, bool> filterFunc) where T : INotifyPropertyChanged
+        //{
+        //    return Where(new InputCollectionWrapper<T>(source), filterFunc);            
+        //}
         
         public static ReadOnlyContinuousCollection<T> Where<T>(
             this ReadOnlyObservableCollection<T> source, Func<T, bool> filterFunc) where T :  INotifyPropertyChanged

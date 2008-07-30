@@ -46,6 +46,7 @@
   -->
   <ItemGroup>
     <Compile Include="CLinqTest.cs" />
+    <Compile Include="Person1.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ContinuousLinq\ContinuousLinq.csproj">
