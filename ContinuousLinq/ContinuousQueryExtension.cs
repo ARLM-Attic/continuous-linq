@@ -19,21 +19,15 @@ namespace ContinuousLinq
         #region Where
         
         private static ReadOnlyContinuousCollection<T> Where<T>(
-            InputCollectionWrapper<T> source, Func<T, bool> filterFunc) where T : INotifyPropertyChanged
+            InputCollectionWrapper<T> source, Expression<Func<T, bool>> filterExpr) where T : INotifyPropertyChanged
         {            
             LinqContinuousCollection<T> output = new LinqContinuousCollection<T>();
-            new FilteringViewAdapter<T>(source, output, filterFunc);
+            new SmartFilterAdapter<T>(source, output, filterExpr);
             return output;            
-        }
-
-        //public static ReadOnlyContinuousCollection<T> Where<T>(
-        //    this ObservableCollection<T> source, Func<T, bool> filterFunc) where T : INotifyPropertyChanged
-        //{
-        //    return Where(new InputCollectionWrapper<T>(source), filterFunc);            
-        //}
+        }        
         
         public static ReadOnlyContinuousCollection<T> Where<T>(
-            this ReadOnlyObservableCollection<T> source, Func<T, bool> filterFunc) where T :  INotifyPropertyChanged
+            this ReadOnlyObservableCollection<T> source, Expression<Func<T, bool>> filterFunc) where T :  INotifyPropertyChanged
         {
             return Where(new InputCollectionWrapper<T>(source), filterFunc);
         }
@@ -41,11 +35,8 @@ namespace ContinuousLinq
         public static ReadOnlyContinuousCollection<T> Where<T>(
             this ObservableCollection<T> source,
             Expression<Func<T, bool>> filterExpr) where T : INotifyPropertyChanged
-        {
-            LinqContinuousCollection<T> output = new LinqContinuousCollection<T>();
-            new SmartFilterAdapter<T>(new InputCollectionWrapper<T>(source), 
-                output, filterExpr);
-            return output;
+        {         
+            return Where(new InputCollectionWrapper<T>(source), filterExpr);
         }
         #endregion
 
