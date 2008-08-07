@@ -8,6 +8,7 @@ using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
+using System.Linq.Expressions;
 
 namespace ContinuousLinq.Aggregates
 {
@@ -17,18 +18,22 @@ namespace ContinuousLinq.Aggregates
         protected readonly Func<Tinput, Tfunc> _averageFunc;
 
         protected ContinuousAverageMonitor(ObservableCollection<Tinput> input,
-                                           Func<Tinput, Tfunc> averageFunc)
-            : base(input)
+                                           Expression<Func<Tinput, Tfunc>> averageFunc)
+            : base(input,
+            ExpressionPropertyAnalyzer.GetReferencedPropertyNames(averageFunc)[typeof(Tinput)],
+            false)
         {
-            _averageFunc = averageFunc;
+            _averageFunc = averageFunc.Compile();
             ReAggregate();
         }
 
         protected ContinuousAverageMonitor(ReadOnlyObservableCollection<Tinput> input,
-                                           Func<Tinput, Tfunc> averageFunc)
-            : base(input)
+                                           Expression<Func<Tinput, Tfunc>> averageFunc)
+            : base(input,
+            ExpressionPropertyAnalyzer.GetReferencedPropertyNames(averageFunc)[typeof(Tinput)],
+            false)
         {
-            _averageFunc = averageFunc;
+            _averageFunc = averageFunc.Compile();
             ReAggregate();
         }
     }
@@ -37,13 +42,13 @@ namespace ContinuousLinq.Aggregates
         where T : INotifyPropertyChanged
     {
         public ContinuousAverageMonitorDecimal(ObservableCollection<T> input,
-                                               Func<T, decimal> averageFunc)
+                                               Expression<Func<T, decimal>> averageFunc)
             : base(input, averageFunc)
         {
         }
 
         public ContinuousAverageMonitorDecimal(ReadOnlyObservableCollection<T> input,
-                                               Func<T, decimal> averageFunc)
+                                               Expression<Func<T, decimal>> averageFunc)
             : base(input, averageFunc)
         {
         }
@@ -65,13 +70,13 @@ namespace ContinuousLinq.Aggregates
         where T : INotifyPropertyChanged
     {
         public ContinuousAverageMonitorDouble(ObservableCollection<T> input,
-                                              Func<T, double> averageFunc)
+                                              Expression<Func<T, double>> averageFunc)
             : base(input, averageFunc)
         {
         }
 
         public ContinuousAverageMonitorDouble(ReadOnlyObservableCollection<T> input,
-                                              Func<T, double> averageFunc)
+                                              Expression<Func<T, double>> averageFunc)
             : base(input, averageFunc)
         {
         }
@@ -93,13 +98,13 @@ namespace ContinuousLinq.Aggregates
         where T : INotifyPropertyChanged
     {
         public ContinuousAverageMonitorFloat(ObservableCollection<T> input,
-                                             Func<T, float> averageFunc)
+                                             Expression<Func<T, float>> averageFunc)
             : base(input, averageFunc)
         {
         }
 
         public ContinuousAverageMonitorFloat(ReadOnlyObservableCollection<T> input,
-                                             Func<T, float> averageFunc)
+                                             Expression<Func<T, float>> averageFunc)
             : base(input, averageFunc)
         {
         }
@@ -120,13 +125,13 @@ namespace ContinuousLinq.Aggregates
     internal class ContinuousAverageMonitorDoubleInt<T> : ContinuousAverageMonitor<T, int, double> where T : INotifyPropertyChanged
     {
         public ContinuousAverageMonitorDoubleInt(ObservableCollection<T> input,
-                                                 Func<T, int> averageFunc)
+                                                 Expression<Func<T, int>> averageFunc)
             : base(input, averageFunc)
         {
         }
 
         public ContinuousAverageMonitorDoubleInt(ReadOnlyObservableCollection<T> input,
-                                                 Func<T, int> averageFunc)
+                                                 Expression<Func<T, int>> averageFunc)
             : base(input, averageFunc)
         {
         }
@@ -147,13 +152,13 @@ namespace ContinuousLinq.Aggregates
     internal class ContinuousAverageMonitorDoubleLong<T> : ContinuousAverageMonitor<T, long, double> where T : INotifyPropertyChanged
     {
         public ContinuousAverageMonitorDoubleLong(ObservableCollection<T> input,
-                                                  Func<T, long> averageFunc)
+                                                  Expression<Func<T, long>> averageFunc)
             : base(input, averageFunc)
         {
         }
 
         public ContinuousAverageMonitorDoubleLong(ReadOnlyObservableCollection<T> input,
-                                                  Func<T, long> averageFunc)
+                                                  Expression<Func<T, long>> averageFunc)
             : base(input, averageFunc)
         {
         }

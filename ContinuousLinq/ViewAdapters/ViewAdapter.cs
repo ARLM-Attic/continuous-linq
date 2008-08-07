@@ -4,12 +4,7 @@ using System.ComponentModel;
 using System.Collections.Specialized;
 
 namespace ContinuousLinq
-{
-    public interface IViewAdapter
-    {
-        IViewAdapter PreviousAdapter { get; }
-        void ReEvaluate();
-    }
+{   
 
     /// We want to arrange things so that when the output collection of
     /// a CLINQ chain gets dropped, all the intermediate adapters and
@@ -180,5 +175,6 @@ namespace ContinuousLinq
         /// Public because of the interface.
         /// </summary>
         public abstract void ReEvaluate();
+      
     }
 }

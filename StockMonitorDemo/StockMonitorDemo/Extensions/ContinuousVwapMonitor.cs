@@ -2,15 +2,27 @@
 using ContinuousLinq.Aggregates;
 using System.ComponentModel;
 using System.Collections.ObjectModel;
+using System.Linq.Expressions;
+using System.Collections.Generic;
+using ContinuousLinq;
 
 namespace StockMonitorDemo.Extensions
 {
+    public static class HashSetExtender
+    {
+        public static HashSet<string> CombineWith(this HashSet<string> source, HashSet<string> extra)
+        {
+            source.UnionWith(extra);
+            return source;
+        }
+    }
+
     public static class VwapExtender
     {
         public static ContinuousValue<double> ContinuousVwap<T>(
             this ObservableCollection<T> input,
-            Func<T, double> priceSelector,
-            Func<T, int> quantitySelector) where T: INotifyPropertyChanged
+            Expression<Func<T, double>> priceSelector,
+            Expression<Func<T, int>> quantitySelector) where T: INotifyPropertyChanged
         {
             return new ContinuousVwapMonitor<T>(input, priceSelector, quantitySelector).Value;
         }
@@ -22,12 +34,15 @@ namespace StockMonitorDemo.Extensions
         private readonly Func<T, int> _qtySelector;
 
         public ContinuousVwapMonitor(ObservableCollection<T> input,
-            Func<T, double> priceSelector,
-            Func<T, int> quantitySelector)
-            : base(input)
+            Expression<Func<T, double>> priceSelector,
+            Expression<Func<T, int>> quantitySelector)
+            : base(input,
+              ExpressionPropertyAnalyzer.GetReferencedPropertyNames(priceSelector)[typeof(T)].CombineWith(
+              ExpressionPropertyAnalyzer.GetReferencedPropertyNames(quantitySelector)[typeof(T)]),            
+            false)
         {
-            _priceSelector = priceSelector;
-            _qtySelector = quantitySelector;
+            _priceSelector = priceSelector.Compile();
+            _qtySelector = quantitySelector.Compile();
             ReAggregate();
         }
 

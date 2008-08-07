@@ -8,6 +8,7 @@ using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
+using System.Linq.Expressions;
 
 namespace ContinuousLinq.Aggregates
 {
@@ -16,18 +17,22 @@ namespace ContinuousLinq.Aggregates
         protected readonly Func<Tinput, Toutput> _minFunc;
 
         protected ContinuousMinMonitor(ObservableCollection<Tinput> input,
-                                       Func<Tinput, Toutput> minFunc)
-            : base(input)
+                                       Expression<Func<Tinput, Toutput>> minFunc)
+            : base(input,
+            ExpressionPropertyAnalyzer.GetReferencedPropertyNames(minFunc)[typeof(Tinput)],
+            false)            
         {
-            _minFunc = minFunc;
+            _minFunc = minFunc.Compile();
             ReAggregate();
         }
 
         protected ContinuousMinMonitor(ReadOnlyObservableCollection<Tinput> input,
-                                       Func<Tinput, Toutput> minFunc)
-            : base(input)
+                                       Expression<Func<Tinput, Toutput>> minFunc)
+            : base(input,
+            ExpressionPropertyAnalyzer.GetReferencedPropertyNames(minFunc)[typeof(Tinput)],
+            false)
         {
-            _minFunc = minFunc;
+            _minFunc = minFunc.Compile();
             ReAggregate();
         }
     }
@@ -35,13 +40,13 @@ namespace ContinuousLinq.Aggregates
     internal class ContinuousMinMonitorInt<T> : ContinuousMinMonitor<T, int> where T : INotifyPropertyChanged
     {
         public ContinuousMinMonitorInt(ObservableCollection<T> input,
-                                       Func<T, int> minFunc)
+                                       Expression<Func<T, int>> minFunc)
             : base(input, minFunc)
         {
         }
 
         public ContinuousMinMonitorInt(ReadOnlyObservableCollection<T> input,
-                                       Func<T, int> minFunc)
+                                       Expression<Func<T, int>> minFunc)
             : base(input, minFunc)
         {
         }
@@ -62,13 +67,13 @@ namespace ContinuousLinq.Aggregates
     internal class ContinuousMinMonitorLong<T> : ContinuousMinMonitor<T, long> where T : INotifyPropertyChanged
     {
         public ContinuousMinMonitorLong(ObservableCollection<T> input,
-                                        Func<T, long> minFunc)
+                                        Expression<Func<T, long>> minFunc)
             : base(input, minFunc)
         {
         }
 
         public ContinuousMinMonitorLong(ReadOnlyObservableCollection<T> input,
-                                        Func<T, long> minFunc)
+                                        Expression<Func<T, long>> minFunc)
             : base(input, minFunc)
         {
         }
@@ -89,13 +94,13 @@ namespace ContinuousLinq.Aggregates
     internal class ContinuousMinMonitorDouble<T> : ContinuousMinMonitor<T, double> where T : INotifyPropertyChanged
     {
         public ContinuousMinMonitorDouble(ObservableCollection<T> input,
-                                          Func<T, double> minFunc)
+                                          Expression<Func<T, double>> minFunc)
             : base(input, minFunc)
         {
         }
 
         public ContinuousMinMonitorDouble(ReadOnlyObservableCollection<T> input,
-                                          Func<T, double> minFunc)
+                                          Expression<Func<T, double>> minFunc)
             : base(input, minFunc)
         {
         }
@@ -116,13 +121,13 @@ namespace ContinuousLinq.Aggregates
     internal class ContinuousMinMonitorFloat<T> : ContinuousMinMonitor<T, float> where T : INotifyPropertyChanged
     {
         public ContinuousMinMonitorFloat(ObservableCollection<T> input,
-                                         Func<T, float> minFunc)
+                                         Expression<Func<T, float>> minFunc)
             : base(input, minFunc)
         {
         }
 
         public ContinuousMinMonitorFloat(ReadOnlyObservableCollection<T> input,
-                                         Func<T, float> minFunc)
+                                         Expression<Func<T, float>> minFunc)
             : base(input, minFunc)
         {
         }
@@ -143,13 +148,13 @@ namespace ContinuousLinq.Aggregates
     internal class ContinuousMinMonitorDecimal<T> : ContinuousMinMonitor<T, decimal> where T : INotifyPropertyChanged
     {
         public ContinuousMinMonitorDecimal(ObservableCollection<T> input,
-                                           Func<T, decimal> minFunc)
+                                           Expression<Func<T, decimal>> minFunc)
             : base(input, minFunc)
         {
         }
 
         public ContinuousMinMonitorDecimal(ReadOnlyObservableCollection<T> input,
-                                           Func<T, decimal> minFunc)
+                                           Expression<Func<T, decimal>> minFunc)
             : base(input, minFunc)
         {
         }

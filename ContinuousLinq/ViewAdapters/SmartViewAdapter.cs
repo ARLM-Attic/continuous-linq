@@ -18,6 +18,11 @@ namespace ContinuousLinq
         private readonly InputCollectionWrapper<TInput> _input;
         private readonly OutputCollectionWrapper<TOutput> _output;
 
+#if DEBUG
+        public int PropertyChangeNotifyCount { get; set; }
+#endif
+
+
         protected SmartViewAdapter(InputCollectionWrapper<TInput> input,
             LinqContinuousCollection<TOutput> output,
             HashSet<string> monitoredProperties)
@@ -45,18 +50,23 @@ namespace ContinuousLinq
 
         private void SubscribeToItem(TInput item)
         {
+            if (_monitoredProperties == null || _monitoredProperties.Count == 0)
+                PropertyChangedEventManager.AddListener(item, this, string.Empty);
+
             foreach (string monitoredProperty in _monitoredProperties)
             {
                 PropertyChangedEventManager.AddListener(
                     item,
                     this,
-                    monitoredProperty);
-                Debug.WriteLine("[SVA] Subscribed to property " + monitoredProperty);
+                    monitoredProperty);                
             }
         }
 
         private void UnsubscribeFromItem(TInput item)
         {
+            if (_monitoredProperties == null || _monitoredProperties.Count == 0)
+                PropertyChangedEventManager.RemoveListener(item, this, string.Empty);
+
             foreach (string monitoredProperty in _monitoredProperties)
             {
                 PropertyChangedEventManager.RemoveListener(
@@ -87,6 +97,9 @@ namespace ContinuousLinq
         {            
             if (managerType == typeof(PropertyChangedEventManager))
             {                
+#if DEBUG
+               PropertyChangeNotifyCount++;
+#endif
                 ItemPropertyChanged((TInput)sender);
             }
             else

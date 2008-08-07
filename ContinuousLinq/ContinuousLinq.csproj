@@ -54,7 +54,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Aggregates\AggregateViewAdapter.cs" />
+    <Compile Include="ViewAdapters\AggregateViewAdapter.cs" />
     <Compile Include="Aggregates\ContinuousAggregationExtension.cs" />
     <Compile Include="Aggregates\ContinuousAverageMonitor.cs" />
     <Compile Include="Aggregates\ContinuousCountMonitor.cs" />
@@ -71,6 +71,7 @@
     <Compile Include="LinqContinuousCollection.cs" />
     <Compile Include="OutputCollectionWrapper.cs" />
     <Compile Include="ReadOnlyContinuousCollection.cs" />
+    <Compile Include="ViewAdapters\IViewAdapter.cs" />
     <Compile Include="ViewAdapters\SelectingManyViewAdapter.cs" />
     <Compile Include="InputCollectionWrapper.cs" />
     <Compile Include="ViewAdapters\SelectingViewAdapter.cs" />

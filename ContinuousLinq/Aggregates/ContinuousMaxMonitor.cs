@@ -8,6 +8,7 @@ using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
+using System.Linq.Expressions;
 
 namespace ContinuousLinq.Aggregates
 {
@@ -17,18 +18,22 @@ namespace ContinuousLinq.Aggregates
         protected readonly Func<Tinput, Toutput> _maxFunc;
 
         protected ContinuousMaxMonitor(ObservableCollection<Tinput> input,
-                                       Func<Tinput, Toutput> maxFunc)
-            : base(input)
+                                       Expression<Func<Tinput, Toutput>> maxFunc)
+            : base(input,
+            ExpressionPropertyAnalyzer.GetReferencedPropertyNames(maxFunc)[typeof(Tinput)],
+            false)
         {
-            _maxFunc = maxFunc;
+            _maxFunc = maxFunc.Compile();
             ReAggregate();
         }
 
         protected ContinuousMaxMonitor(ReadOnlyObservableCollection<Tinput> input,
-                                       Func<Tinput, Toutput> maxFunc)
-            : base(input)
+                                       Expression<Func<Tinput, Toutput>> maxFunc)
+            : base(input,
+            ExpressionPropertyAnalyzer.GetReferencedPropertyNames(maxFunc)[typeof(Tinput)],
+            false)
         {
-            _maxFunc = maxFunc;
+            _maxFunc = maxFunc.Compile();
             ReAggregate();
         }
     }
@@ -36,13 +41,13 @@ namespace ContinuousLinq.Aggregates
     internal class ContinuousMaxMonitorInt<T> : ContinuousMaxMonitor<T, int> where T : INotifyPropertyChanged
     {
         public ContinuousMaxMonitorInt(ObservableCollection<T> input,
-                                       Func<T, int> maxFunc)
+                                       Expression<Func<T, int>> maxFunc)
             : base(input, maxFunc)
         {
         }
 
         public ContinuousMaxMonitorInt(ReadOnlyObservableCollection<T> input,
-                                       Func<T, int> maxFunc)
+                                       Expression<Func<T, int>> maxFunc)
             : base(input, maxFunc)
         {
         }
@@ -63,13 +68,13 @@ namespace ContinuousLinq.Aggregates
     internal class ContinuousMaxMonitorLong<T> : ContinuousMaxMonitor<T, long> where T : INotifyPropertyChanged
     {
         public ContinuousMaxMonitorLong(ObservableCollection<T> input,
-                                        Func<T, long> maxFunc)
+                                        Expression<Func<T, long>> maxFunc)
             : base(input, maxFunc)
         {
         }
 
         public ContinuousMaxMonitorLong(ReadOnlyObservableCollection<T> input,
-                                        Func<T, long> maxFunc)
+                                        Expression<Func<T, long>> maxFunc)
             : base(input, maxFunc)
         {
         }
@@ -91,13 +96,13 @@ namespace ContinuousLinq.Aggregates
         ContinuousMaxMonitor<T, double> where T : INotifyPropertyChanged
     {
         public ContinuousMaxMonitorDouble(ObservableCollection<T> input,
-                                          Func<T, double> maxFunc)
+                                          Expression<Func<T, double>> maxFunc)
             : base(input, maxFunc)
         {
         }
 
         public ContinuousMaxMonitorDouble(ReadOnlyObservableCollection<T> input,
-                                          Func<T, double> maxFunc)
+                                          Expression<Func<T, double>> maxFunc)
             : base(input, maxFunc)
         {
         }
@@ -118,13 +123,13 @@ namespace ContinuousLinq.Aggregates
     internal class ContinuousMaxMonitorFloat<T> : ContinuousMaxMonitor<T, float> where T : INotifyPropertyChanged
     {
         public ContinuousMaxMonitorFloat(ObservableCollection<T> input,
-                                         Func<T, float> maxFunc)
+                                         Expression<Func<T, float>> maxFunc)
             : base(input, maxFunc)
         {
         }
 
         public ContinuousMaxMonitorFloat(ReadOnlyObservableCollection<T> input,
-                                         Func<T, float> maxFunc)
+                                         Expression<Func<T, float>> maxFunc)
             : base(input, maxFunc)
         {
         }
@@ -145,13 +150,13 @@ namespace ContinuousLinq.Aggregates
     internal class ContinuousMaxMonitorDecimal<T> : ContinuousMaxMonitor<T, decimal> where T : INotifyPropertyChanged
     {
         public ContinuousMaxMonitorDecimal(ObservableCollection<T> input,
-                                           Func<T, decimal> maxFunc)
+                                           Expression<Func<T, decimal>> maxFunc)
             : base(input, maxFunc)
         {
         }
 
         public ContinuousMaxMonitorDecimal(ReadOnlyObservableCollection<T> input,
-                                           Func<T, decimal> maxFunc)
+                                           Expression<Func<T, decimal>> maxFunc)
             : base(input, maxFunc)
         {
         }

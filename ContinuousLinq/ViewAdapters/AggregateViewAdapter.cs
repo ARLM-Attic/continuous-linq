@@ -1,0 +1,167 @@
+﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Collections.Specialized;
+using System.Linq;
+using System.Linq.Expressions;
+
+namespace ContinuousLinq.Aggregates
+{
+    public abstract class AggregateViewAdapter<Tinput, Toutput> : System.Windows.IWeakEventListener where Tinput : INotifyPropertyChanged
+    {
+        private readonly InputCollectionWrapper<Tinput> _input;
+        private readonly NotifyCollectionChangedEventHandler _collectionChangedDelegate;
+        private readonly PropertyChangedEventHandler _propertyChangedDelegate;
+        private readonly Dictionary<Tinput, WeakPropertyChangedHandler> _handlerMap =
+            new Dictionary<Tinput, WeakPropertyChangedHandler>();
+        private readonly ContinuousValue<Toutput> _output = new ContinuousValue<Toutput>();
+
+        protected HashSet<string> _monitoredProperties;
+        private bool _collectionOnlyMonitor = false;
+
+        protected AggregateViewAdapter(ObservableCollection<Tinput> input, 
+            HashSet<string> monitoredProperties,
+            bool collectionOnly) :
+            this(new InputCollectionWrapper<Tinput>(input), monitoredProperties, collectionOnly)
+        {
+        }
+
+        protected AggregateViewAdapter(ReadOnlyObservableCollection<Tinput> input,
+            HashSet<string> monitoredProperties,
+            bool collectionOnly) :
+            this(new InputCollectionWrapper<Tinput>(input), monitoredProperties, collectionOnly)
+        {
+        }
+
+        private AggregateViewAdapter(InputCollectionWrapper<Tinput> input,
+            HashSet<string> monitoredProperties,
+            bool collectionOnly)
+        {
+            _collectionOnlyMonitor = collectionOnly;
+            _monitoredProperties = monitoredProperties;
+            _input = input;
+            _output.SourceAdapter = this;                        
+
+            foreach (Tinput item in this.InputCollection)
+            {
+                SubscribeToItem(item);
+            }
+
+            CollectionChangedEventManager.AddListener(
+                _input.InnerAsNotifier, this);
+            // Subclasses must call ReAggregate here!!!
+        }
+
+        protected IList<Tinput> Input
+        {
+            get { return _input.InnerAsList; }
+        }
+
+        protected void SubscribeToItem(Tinput item)
+        {
+            if (_collectionOnlyMonitor) return;
+
+            if (_monitoredProperties == null || _monitoredProperties.Count == 0)
+                PropertyChangedEventManager.AddListener(item, this, string.Empty);
+
+            else
+            {
+                foreach (string monitoredProperty in _monitoredProperties)
+                {
+                    PropertyChangedEventManager.AddListener(
+                        item,
+                        this,
+                        monitoredProperty);
+                }
+            }
+        }
+
+        protected void UnsubscribeFromItem(Tinput item)
+        {
+            if (_collectionOnlyMonitor) return;
+
+            if (_monitoredProperties == null || _monitoredProperties.Count == 0)
+                PropertyChangedEventManager.RemoveListener(item, this, string.Empty);
+
+            else
+            {
+                foreach (string monitoredProperty in _monitoredProperties)
+                {
+                    PropertyChangedEventManager.RemoveListener(
+                        item,
+                        this,
+                        monitoredProperty);
+                }
+            }
+        }
+
+        /// <summary>
+        /// A pointer to the collection to which this adapter is listening
+        /// </summary>
+        protected IList<Tinput> InputCollection
+        {
+            get { return _input.InnerAsList; }
+        }        
+
+        public ContinuousValue<Toutput> Value
+        {
+            get { return _output; }
+        }
+
+        protected void SetCurrentValue(Toutput newvalue)
+        {
+            _output.CurrentValue = newvalue;
+        }
+
+        protected void SetCurrentValueToDefault()
+        {
+            _output.CurrentValue = default(Toutput);
+        }
+
+        protected abstract void ReAggregate();        
+
+        #region IWeakEventListener Members
+
+        public bool ReceiveWeakEvent(System.Type managerType, object sender, System.EventArgs e)
+        {
+            if (managerType == typeof(PropertyChangedEventManager))
+            {
+                ReAggregate();
+            }
+            else
+            {
+                // collection changed event.
+                NotifyCollectionChangedEventArgs collectionArgs =
+                    (NotifyCollectionChangedEventArgs)e;
+                switch (collectionArgs.Action)
+                {
+                    case NotifyCollectionChangedAction.Remove:
+                        Tinput toDelete = (Tinput)collectionArgs.OldItems[0];
+                        UnsubscribeFromItem(toDelete);                        
+                        break;
+                    case NotifyCollectionChangedAction.Add:
+                        Tinput toAdd = (Tinput)collectionArgs.NewItems[0];
+                        SubscribeToItem(toAdd);                        
+                        break;
+                    case NotifyCollectionChangedAction.Replace:
+                    case NotifyCollectionChangedAction.Move:
+                        UnsubscribeFromItem((Tinput)collectionArgs.OldItems[0]);
+                        SubscribeToItem((Tinput)collectionArgs.NewItems[0]);
+                        break;
+                    case NotifyCollectionChangedAction.Reset:
+                        foreach (Tinput item in this.InputCollection)
+                        {
+                            UnsubscribeFromItem(item);
+                        }                        
+                        break;
+                }
+
+                ReAggregate();
+            }
+
+            return true;
+        }
+
+        #endregion
+    }
+}

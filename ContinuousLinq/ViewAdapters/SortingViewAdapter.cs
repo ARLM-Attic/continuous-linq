@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using ISimpleComparer = System.Collections.IComparer;
+using System.Linq.Expressions;
 
 namespace ContinuousLinq
 {
@@ -14,25 +15,30 @@ namespace ContinuousLinq
     /// is re-sorted accordingly.
     /// </summary>
     /// <typeparam name="TSource"></typeparam>
-    internal sealed class SortingViewAdapter<TSource> :
-        ViewAdapter<TSource, TSource> where TSource : INotifyPropertyChanged
+    internal sealed class SortingViewAdapter<TSource,TKey> :
+        SmartViewAdapter<TSource, TSource> where TSource : INotifyPropertyChanged where TKey : IComparable
     {
         private IComparer<TSource> _compareFunc;
         private bool _isLastInChain = true;
 
         public SortingViewAdapter(InputCollectionWrapper<TSource> input,
-            LinqContinuousCollection<TSource> output, IComparer<TSource> compareFunc)
-            : base(input, output)
+            LinqContinuousCollection<TSource> output, Expression<Func<TSource, TKey>> keySelectorExpr,
+            bool descending)
+            : base(input, output,
+            ExpressionPropertyAnalyzer.GetReferencedPropertyNames(keySelectorExpr)[typeof(TSource)])
         {
-            if (compareFunc == null)
-                throw new ArgumentNullException("compareFunc");
-            SetComparerChain(compareFunc);
+            if (keySelectorExpr == null)
+                throw new ArgumentNullException("keySelectorExpr");
+            _compareFunc = new FuncComparer<TSource, TKey>(keySelectorExpr.Compile(), descending);
+
+            
+            SetComparerChain(_compareFunc);
             FullSort(); // Because we do not know yet if we are last in chain.
         }
 
         private void SetComparerChain(IComparer<TSource> compareFunc)
         {
-            SortingViewAdapter<TSource> previous = this.PreviousAdapter as SortingViewAdapter<TSource>;
+            SortingViewAdapter<TSource,TKey> previous = this.PreviousAdapter as SortingViewAdapter<TSource,TKey>;
             if (previous != null)
             {
                 previous._isLastInChain = false;
@@ -53,20 +59,6 @@ namespace ContinuousLinq
             this.OutputCollection.AddRange(sortedList);
         }
 
-        protected override void OnCollectionItemPropertyChanged(TSource item, string propertyName)
-        {            
-            // Short circuit the darn thing if we are a chained orderby.
-            // Last sorter in line will do the sorting.
-            if (_isLastInChain)
-            {
-                if (this.OutputCollection.Remove(item))
-                {
-                    InsertItemInSortOrder(item);
-                }
-                // Else, already deleted.
-            }
-        }
-
         /// <summary>
         /// This can probably be optimized to cost O(log2N) instead of O(N)
         /// </summary>
@@ -82,29 +74,42 @@ namespace ContinuousLinq
             this.OutputCollection.Insert(index, item);
         }
 
-        protected override bool RemoveItem(TSource deleteItem, int index)
-        {
-            return this.OutputCollection.Remove(deleteItem);            
-        }
 
-        protected override void AddItem(TSource newItem, int index)
-        {            
-            // Short circuit the darn thing if we are a chained orderby.
-            // Last sorter in line will do the sorting.
+        #region Smart View Adapter Overrides
+        protected override void ItemAdded(TSource item)
+        {
             if (_isLastInChain)
             {
-                InsertItemInSortOrder(newItem);
+                InsertItemInSortOrder(item);
             }
             else
             {
-                this.OutputCollection.Insert(index, newItem);
+                this.OutputCollection.Add(item);
             }
         }
 
-        protected override void Clear()
+        protected override void ItemPropertyChanged(TSource item)
+        {
+            if (_isLastInChain)
+            {
+                if (this.OutputCollection.Remove(item))
+                {
+                    InsertItemInSortOrder(item);
+                }
+                // Else, already deleted.
+            }
+        }
+
+        protected override bool ItemRemoved(TSource item)
+        {
+            return this.OutputCollection.Remove(item);
+        }
+
+        protected override void ItemsCleared()
         {
             this.OutputCollection.Clear();
         }
+        #endregion
 
         private class ChainComparer : IComparer<TSource>
         {
