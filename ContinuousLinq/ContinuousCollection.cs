@@ -18,40 +18,22 @@ namespace ContinuousLinq
     /// <typeparam name="T">Type of element contained within the collection</typeparam>
     public class ContinuousCollection<T> : ObservableCollection<T>
     {
-        public delegate void CollectionItemChangedDelegate(T item, string propertyName);
-
-        private event CollectionItemChangedDelegate CollectionItemChangedPrivate;
-        public event CollectionItemChangedDelegate CollectionItemChanged
-        {
-            add
-            {
-                AddOrRemoveListener(value, true);
-            }
-            remove
-            {
-                AddOrRemoveListener(value, false);
-            }
-        }
-
         // Maybe later this will be changeable:
         private readonly DispatcherPriority _updatePriority = DispatcherPriority.Normal;
         private readonly Dispatcher _dispatcher;
-        private readonly Dictionary<INotifyPropertyChanged, WeakPropertyChangedHandler> _handlerMap =
-            new Dictionary<INotifyPropertyChanged, WeakPropertyChangedHandler>();
+        
 
         private delegate void ZeroDelegate();
         private delegate void IndexDelegate(int index);
         private delegate void IndexItemDelegate(int index, T item);
         private delegate void IndexIndexDelegate(int oldIndex, int newIndex);
-        private delegate void AddOrRemoveDelegate(CollectionItemChangedDelegate listener, bool add);
-
+        
         /// <summary>
         /// Default constructor, initializes a new list and obtains a reference
         /// to the dispatcher.
         /// </summary>
         public ContinuousCollection()
-        {
-            //_dispatcher = Dispatcher.CurrentDispatcher;
+        {        
             _dispatcher = Dispatcher.FromThread(Thread.CurrentThread);
         }
 
@@ -61,8 +43,7 @@ namespace ContinuousLinq
         /// </summary>
         public ContinuousCollection(List<T> list)
             : base(list)
-        {
-            //_dispatcher = Dispatcher.CurrentDispatcher;
+        {         
             _dispatcher = Dispatcher.FromThread(Thread.CurrentThread);
         }
 
@@ -129,30 +110,6 @@ namespace ContinuousLinq
             return _dispatcher == null || _dispatcher.CheckAccess();
         }
 
-        private void AddOrRemovePropertyListener(T item, bool add)
-        {
-            // Weak listeners so we can drop collection when not dropping objects.
-            INotifyPropertyChanged listener = item as INotifyPropertyChanged;
-            if (listener == null)
-                return;
-            if (add)
-            {
-                if (_handlerMap.ContainsKey(listener) == false)
-                {
-                    _handlerMap[listener] = new WeakPropertyChangedHandler(listener, pchangeItem_PropertyChanged);
-                }
-            }
-            else
-            {
-                WeakPropertyChangedHandler handler;
-                if (_handlerMap.TryGetValue(listener, out handler))
-                {
-                    handler.Detach();
-                    _handlerMap.Remove(listener);
-                }
-            }
-        }
-
         /// <summary>
         /// Overridden method that does an "items reset" notification on the dispatch thread
         /// so that bound GUI elements will be aware when this collection is emptied.
@@ -161,10 +118,6 @@ namespace ContinuousLinq
         {
             if (NoInvoke())
             {
-                foreach (T item in this)
-                {
-                    AddOrRemovePropertyListener(item, false);
-                }
                 base.ClearItems();
             }
             else
@@ -183,46 +136,12 @@ namespace ContinuousLinq
         {         
             if (NoInvoke())
             {
-                AddOrRemovePropertyListener(item, true);
                 base.InsertItem(index, item);
             }
             else
             {
                 _dispatcher.Invoke(_updatePriority,
                     new IndexItemDelegate(InsertItem), index, item);
-            }
-        }
-
-        private void pchangeItem_PropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-            if (NoInvoke())
-            {
-                if (CollectionItemChangedPrivate != null)
-                    CollectionItemChangedPrivate((T)sender, e.PropertyName);
-            }
-            else
-            {
-                _dispatcher.Invoke(_updatePriority,
-                                   new PropertyChangedEventHandler(pchangeItem_PropertyChanged), sender, e);
-            }
-        }
-
-        private void AddOrRemoveListener(CollectionItemChangedDelegate listener, bool add)
-        {
-            if (NoInvoke())
-            {
-                if (add)
-                {
-                    CollectionItemChangedPrivate += listener;
-                }
-                else
-                {
-                    CollectionItemChangedPrivate -= listener;
-                }
-            }
-            else
-            {
-                _dispatcher.Invoke(_updatePriority, new AddOrRemoveDelegate(AddOrRemoveListener), listener, add);
             }
         }
 
@@ -248,7 +167,7 @@ namespace ContinuousLinq
         {
             if (NoInvoke())
             {
-                AddOrRemovePropertyListener(this[index], false);
+            //    AddOrRemovePropertyListener(this[index], false);
                 base.RemoveItem(index);
             }
             else
@@ -257,7 +176,6 @@ namespace ContinuousLinq
             }
 
         }
-
 
         /// <summary>
         /// Overridden method that performs a thread-safe replacement of an item within the collection.
@@ -268,8 +186,6 @@ namespace ContinuousLinq
         {
             if (NoInvoke())
             {
-                AddOrRemovePropertyListener(this[index], false);
-                AddOrRemovePropertyListener(item, true);
                 base.SetItem(index, item);
             }
             else
