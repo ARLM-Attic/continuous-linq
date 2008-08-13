@@ -31,5 +31,33 @@ namespace StockMonitorDemo.Views
             this.DataContext = _model;
             
         }
+
+        private void toggleHighAgg_Click(object sender, RoutedEventArgs e)
+        {
+            if (_model.LiveHigh.IsPaused)
+            {
+                _model.LiveHigh.Resume();
+                toggleHighAgg.Content = "Pause";
+            }
+            else
+            {
+                _model.LiveHigh.Pause();
+                toggleHighAgg.Content = "Resume";
+            }
+        }
+
+        private void toggleVwapAgg_Click(object sender, RoutedEventArgs e)
+        {
+            if (_model.LiveVwap.IsPaused)
+            {
+                _model.LiveVwap.Resume();
+                toggleVwapAgg.Content = "Pause";
+            }
+            else
+            {
+                _model.LiveVwap.Pause();
+                toggleVwapAgg.Content = "Resume";
+            }
+        }
     }
 }

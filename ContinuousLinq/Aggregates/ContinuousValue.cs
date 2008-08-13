@@ -31,6 +31,24 @@ namespace ContinuousLinq.Aggregates
             return _realValue.ToString();
         }
 
+        public void Pause()
+        {
+            (SourceAdapter as IAggregateAdapter).Pause();
+        }
+
+        public void Resume()
+        {
+            (SourceAdapter as IAggregateAdapter).Resume();
+        }
+
+        public bool IsPaused
+        {
+            get
+            {
+                return (SourceAdapter as IAggregateAdapter).IsPaused;
+            }
+        }
+
         #region INotifyPropertyChanged Members
 
         public event PropertyChangedEventHandler PropertyChanged;

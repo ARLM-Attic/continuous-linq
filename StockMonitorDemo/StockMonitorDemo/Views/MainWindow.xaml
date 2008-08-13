@@ -119,6 +119,7 @@
                 <StackPanel Orientation="Horizontal">
                     <TextBlock Text="High:" FontFamily="Segoe UI" FontSize="12" Padding="5,5,5,5" FontWeight="Bold"/>    
                     <TextBlock Text="{Binding LiveHigh.CurrentValue, Converter={StaticResource PriceFormatter}}" FontFamily="SegoeUI" FontSize="12" Padding="5,5,5,5" FontWeight="Bold"/>
+                    <Button x:Name="toggleHighAgg" Padding="5,5,5,5" Click="toggleHighAgg_Click">Pause</Button>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal">
                     <TextBlock Text="Low:"  FontFamily="Segoe UI" FontSize="12" Padding="5,5,5,5" FontWeight="Bold"/>
@@ -127,6 +128,7 @@
                 <StackPanel Orientation="Horizontal">
                     <TextBlock Text="VWAP:" FontFamily="Segoe UI" FontSize="12" Padding="5,5,5,5" FontWeight="Bold"/>    
                     <TextBlock Text="{Binding LiveVwap.CurrentValue, Converter={StaticResource PriceFormatter}}" FontFamily="SegoeUI" FontSize="12" Padding="5,5,5,5" FontWeight="Bold"/>                    
+                    <Button x:Name="toggleVwapAgg" Padding="5,5,5,5" Click="toggleVwapAgg_Click">Pause</Button>
                 </StackPanel>                                
             </StackPanel>
             

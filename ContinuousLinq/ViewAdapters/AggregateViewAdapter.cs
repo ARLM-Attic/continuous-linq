@@ -7,17 +7,16 @@ using System.Linq.Expressions;
 
 namespace ContinuousLinq.Aggregates
 {
-    public abstract class AggregateViewAdapter<Tinput, Toutput> : System.Windows.IWeakEventListener where Tinput : INotifyPropertyChanged
+    public abstract class AggregateViewAdapter<Tinput, Toutput> : 
+        System.Windows.IWeakEventListener,
+        IAggregateAdapter where Tinput : INotifyPropertyChanged
     {
-        private readonly InputCollectionWrapper<Tinput> _input;
-        private readonly NotifyCollectionChangedEventHandler _collectionChangedDelegate;
-        private readonly PropertyChangedEventHandler _propertyChangedDelegate;
-        private readonly Dictionary<Tinput, WeakPropertyChangedHandler> _handlerMap =
-            new Dictionary<Tinput, WeakPropertyChangedHandler>();
+        private readonly InputCollectionWrapper<Tinput> _input;        
         private readonly ContinuousValue<Toutput> _output = new ContinuousValue<Toutput>();
 
         protected HashSet<string> _monitoredProperties;
         private bool _collectionOnlyMonitor = false;
+        private bool _paused = false;
 
         protected AggregateViewAdapter(ObservableCollection<Tinput> input, 
             HashSet<string> monitoredProperties,
@@ -123,10 +122,11 @@ namespace ContinuousLinq.Aggregates
         #region IWeakEventListener Members
 
         public bool ReceiveWeakEvent(System.Type managerType, object sender, System.EventArgs e)
-        {
+        {            
             if (managerType == typeof(PropertyChangedEventManager))
             {
-                ReAggregate();
+                if (!_paused)
+                    ReAggregate();
             }
             else
             {
@@ -156,12 +156,32 @@ namespace ContinuousLinq.Aggregates
                         break;
                 }
 
-                ReAggregate();
+                if (!_paused)
+                    ReAggregate();
             }
 
             return true;
         }
 
         #endregion
+
+        public void Pause()
+        {
+            _paused = true;
+        }
+
+        public void Resume()
+        {
+            _paused = false;
+            ReAggregate();
+        }
+
+        public bool IsPaused
+        {
+            get
+            {
+                return _paused;
+            }
+        }
     }
 }

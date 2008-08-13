@@ -54,6 +54,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Aggregates\IAggregateAdapter.cs" />
     <Compile Include="ViewAdapters\AggregateViewAdapter.cs" />
     <Compile Include="Aggregates\ContinuousAggregationExtension.cs" />
     <Compile Include="Aggregates\ContinuousAverageMonitor.cs" />
