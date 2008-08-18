@@ -2,7 +2,11 @@
 
 namespace ContinuousLinq.Aggregates
 {
-    public sealed class ContinuousValue<T> : INotifyPropertyChanged
+    public class ContinuousValue
+    {
+    }
+
+    public sealed class ContinuousValue<T> : ContinuousValue, INotifyPropertyChanged
     {
         private T _realValue;
 
@@ -33,19 +37,19 @@ namespace ContinuousLinq.Aggregates
 
         public void Pause()
         {
-            (SourceAdapter as IAggregateAdapter).Pause();
+            (SourceAdapter as AggregateViewAdapter).Pause();
         }
 
         public void Resume()
         {
-            (SourceAdapter as IAggregateAdapter).Resume();
+            (SourceAdapter as AggregateViewAdapter).Resume();
         }
 
         public bool IsPaused
         {
             get
             {
-                return (SourceAdapter as IAggregateAdapter).IsPaused;
+                return (SourceAdapter as AggregateViewAdapter).IsPaused;
             }
         }
 

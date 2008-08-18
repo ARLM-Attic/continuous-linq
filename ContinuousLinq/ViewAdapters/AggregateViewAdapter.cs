@@ -7,9 +7,69 @@ using System.Linq.Expressions;
 
 namespace ContinuousLinq.Aggregates
 {
+    public abstract class AggregateViewAdapter
+    {
+        protected bool _localPaused = false;
+        protected static bool _globalPaused = false;
+        protected static List<AggregateViewAdapter> _dirtiedSincePause = new List<AggregateViewAdapter>();        
+
+        public static void GlobalPause()
+        {
+            _globalPaused = true;
+        }
+
+        public static void GlobalResume()
+        {
+            _globalPaused = false;
+            ResumeDirtyValues();
+        }
+
+        public void Pause() // LOCAL PAUSE
+        {
+            _localPaused = true;            
+        }
+
+        public void Resume() // LOCAL RESUME
+        {
+            _localPaused = false;
+            if (_dirtiedSincePause.Contains(this))
+            {
+                _dirtiedSincePause.Remove(this);
+                ReAggregate();
+            }
+            
+        }
+
+        private static void ResumeDirtyValues()
+        {
+            foreach (AggregateViewAdapter ava in _dirtiedSincePause)
+            {
+                ava.Resume();
+            }
+            _dirtiedSincePause.Clear();
+        }
+
+        public static bool IsGloballyPaused
+        {
+            get
+            {
+                return _globalPaused;
+            }
+        }
+
+        public bool IsPaused
+        {
+            get
+            {
+                return _localPaused;
+            }
+        }
+
+        protected abstract void ReAggregate();
+    }
+
     public abstract class AggregateViewAdapter<Tinput, Toutput> : 
-        System.Windows.IWeakEventListener,
-        IAggregateAdapter where Tinput : INotifyPropertyChanged
+        AggregateViewAdapter, System.Windows.IWeakEventListener where Tinput : INotifyPropertyChanged
     {
         private readonly InputCollectionWrapper<Tinput> _input;        
         private readonly ContinuousValue<Toutput> _output = new ContinuousValue<Toutput>();
@@ -117,15 +177,19 @@ namespace ContinuousLinq.Aggregates
             _output.CurrentValue = default(Toutput);
         }
 
-        protected abstract void ReAggregate();        
+        //protected abstract void ReAggregate();        
 
         #region IWeakEventListener Members
 
         public bool ReceiveWeakEvent(System.Type managerType, object sender, System.EventArgs e)
-        {            
+        {
+            if (_globalPaused || _localPaused)
+            {
+                _dirtiedSincePause.Add(this);
+            }
             if (managerType == typeof(PropertyChangedEventManager))
             {
-                if (!_paused)
+                if (!_localPaused && !_globalPaused)
                     ReAggregate();
             }
             else
@@ -156,32 +220,13 @@ namespace ContinuousLinq.Aggregates
                         break;
                 }
 
-                if (!_paused)
+                if (!_localPaused && !_globalPaused)
                     ReAggregate();
             }
 
             return true;
         }
 
-        #endregion
-
-        public void Pause()
-        {
-            _paused = true;
-        }
-
-        public void Resume()
-        {
-            _paused = false;
-            ReAggregate();
-        }
-
-        public bool IsPaused
-        {
-            get
-            {
-                return _paused;
-            }
-        }
+        #endregion    
     }
 }
